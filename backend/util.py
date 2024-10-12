@@ -66,3 +66,6 @@ async def refresh_token(session: aiohttp.ClientSession, refresh_token: str):
 
         r.raise_for_status()
         return r.json()
+
+def require_token(token_cache: dict):
+    pass
