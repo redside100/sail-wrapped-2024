@@ -12,15 +12,15 @@ async def init():
 
 
 async def get_random_attachment(video_only: bool = False) -> AttachmentInfo:
-    where_clause = f"extension IN ({', '.join(['?' for _ in VIDEO_EXT_LIST])})"
+    where_clause = f"lower(extension) IN ({', '.join(['?' for _ in VIDEO_EXT_LIST])})"
     if video_only:
         cursor = await conn.execute(
-            f"SELECT id, file_name, author_id AS sender_id, author_name AS sender_handle, timestamp FROM attachments LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE id IN (SELECT id FROM attachments WHERE {where_clause} ORDER BY RANDOM() LIMIT 1)",
+            f"SELECT id, file_name, author_id AS sender_id, author_name AS sender_handle, timestamp, related_message_id FROM attachments LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE id IN (SELECT id FROM attachments WHERE {where_clause} ORDER BY RANDOM() LIMIT 1)",
             VIDEO_EXT_LIST,
         )
     else:
         cursor = await conn.execute(
-            f"SELECT id, file_name, author_id AS sender_id, author_name AS sender_handle, timestamp FROM attachments LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE id IN (SELECT id FROM attachments ORDER BY RANDOM() LIMIT 1)"
+            f"SELECT id, file_name, author_id AS sender_id, author_name AS sender_handle, timestamp, related_message_id FROM attachments LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE id IN (SELECT id FROM attachments ORDER BY RANDOM() LIMIT 1)"
         )
 
     row = await cursor.fetchone()
@@ -37,6 +37,7 @@ async def get_random_attachment(video_only: bool = False) -> AttachmentInfo:
         sender_handle=row[3],
         likes=likes,
         timestamp=row[4],
+        related_message_id=row[5],
     )
 
 
@@ -83,7 +84,7 @@ async def get_message(message_id: int) -> MessageInfo:
 
 async def get_attachment(attachment_id: int) -> Optional[AttachmentInfo]:
     async with conn.execute(
-        "SELECT id, file_name, author_id AS sender_id, author_name AS sender_handle, timestamp FROM attachments LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE id = ?",
+        "SELECT id, file_name, author_id AS sender_id, author_name AS sender_handle, timestamp, related_message_id FROM attachments LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE id = ?",
         (attachment_id,),
     ) as cursor:
         row = await cursor.fetchone()
@@ -100,6 +101,7 @@ async def get_attachment(attachment_id: int) -> Optional[AttachmentInfo]:
         sender_handle=row[3],
         likes=likes,
         timestamp=row[4],
+        related_message_id=row[5],
     )
 
 

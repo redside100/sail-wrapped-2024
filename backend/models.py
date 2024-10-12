@@ -19,6 +19,7 @@ class AttachmentInfo(BaseModel):
     sender_handle: str
     timestamp: int
     likes: int
+    related_message_id: str
 
 class MessageInfo(BaseModel):
     message_id: str
