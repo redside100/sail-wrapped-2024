@@ -21,6 +21,7 @@ class AttachmentInfo(BaseModel):
     likes: int
 
 class MessageInfo(BaseModel):
+    message_id: str
     content: str
     sender_id: str
     sender_handle: str
