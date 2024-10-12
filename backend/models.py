@@ -17,9 +17,10 @@ class AttachmentInfo(BaseModel):
     url: str
     sender_id: str
     sender_handle: str
-    timestamp: int
+    timestamp: str
     likes: int
     related_message_id: str
+    related_message_content: str
 
 class MessageInfo(BaseModel):
     message_id: str
@@ -27,7 +28,7 @@ class MessageInfo(BaseModel):
     sender_id: str
     sender_handle: str
     channel_name: str
-    timestamp: int
+    timestamp: str
     likes: int
 
 class TokenRequestModel(BaseModel):
