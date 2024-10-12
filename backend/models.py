@@ -17,14 +17,27 @@ class AttachmentInfo(BaseModel):
     url: str
     sender_id: str
     sender_handle: str
+    timestamp: int
+    likes: int
+
+class MessageInfo(BaseModel):
+    content: str
+    sender_id: str
+    sender_handle: str
+    channel_name: str
+    timestamp: int
     likes: int
 
 class TokenRequestModel(BaseModel):
     code: str
 
+class RefreshTokenRequestModel(BaseModel):
+    refresh_token: str
+
 class TokenResponseModel(BaseModel):
     access_token: str
     refresh_token: str
+    exp: int
     user_info: UserInfo
 
 class AttachmentRequestModel(BaseModel):

@@ -1,6 +1,6 @@
 import aiohttp
+from fastapi import HTTPException
 from consts import CLIENT_ID, CLIENT_SECRET, DISCORD_API_ENDPOINT, REDIRECT_URI
-
 
 async def verify_token(session: aiohttp.ClientSession, token: str):
     guild_ids = {guild["id"] for guild in await get_guilds(session, token)}
@@ -63,9 +63,10 @@ async def refresh_token(session: aiohttp.ClientSession, refresh_token: str):
         headers=headers,
         auth=aiohttp.BasicAuth(CLIENT_ID, CLIENT_SECRET)
     ) as r:
-
         r.raise_for_status()
-        return r.json()
+        return await r.json()
 
-def require_token(token_cache: dict):
-    pass
+def check_token(token_cache: dict, token: str):
+
+    if token not in token_cache:
+        raise HTTPException(status_code=401, detail="Token expired or missing. Please request a new one.")

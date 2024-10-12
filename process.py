@@ -66,6 +66,8 @@ for i, file_name in enumerate(json_files):
                 [reaction["count"] for reaction in message["reactions"]]
             )
 
+            valid_length = len(content) > 8
+
             t = (
                 message_id,
                 type,
@@ -84,10 +86,11 @@ for i, file_name in enumerate(json_files):
                 mentions,
                 channel_id,
                 channel_name,
+                valid_length,
             )
             conn.cursor().execute(
-                f"INSERT OR REPLACE INTO messages (message_id, type, timestamp, content, author_id, author_name, author_nickname, author_discriminator, author_avatar_url, attachments, embeds, stickers, reactions, total_reactions, mentions, channel_id, channel_name) VALUES "
-                + f"(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                f"INSERT OR REPLACE INTO messages (message_id, type, timestamp, content, author_id, author_name, author_nickname, author_discriminator, author_avatar_url, attachments, embeds, stickers, reactions, total_reactions, mentions, channel_id, channel_name, valid_length) VALUES "
+                + f"(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 t,
             )
 
@@ -110,7 +113,7 @@ for i, file_name in enumerate(json_files):
                         message_id,
                         attachment["fileName"],
                         formatted_timestamp,
-                        pathlib.Path(attachment["fileName"]).suffix
+                        pathlib.Path(attachment["fileName"]).suffix,
                     ),
                 )
         conn.commit()
