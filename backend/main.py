@@ -171,9 +171,15 @@ async def get_attachment(
 
 
 @app.get("/message/random")
-async def get_random_message(token: Annotated[str | None, Header()] = None):
+async def get_random_message(
+    min_length: Annotated[int, Path(title="The minimum length of the message.")],
+    token: Annotated[str | None, Header()] = None,
+):
     check_token(token_cache, token)
-    return await async_db.get_random_message()
+    if min_length < 1:
+        raise HTTPException(status_code=400, detail="The minimum length must be at least 1.")
+    
+    return await async_db.get_random_message(min_length=min_length)
 
 
 @app.get("/message/view/{message_id}")

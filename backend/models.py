@@ -24,15 +24,28 @@ class AttachmentInfo(BaseModel):
     related_channel_name: str
     related_message_content: str
 
+class AttachmentSummary(BaseModel):
+    attachment_id: str
+    file_name: str
+    url: str
+    sender_handle: str
+    related_message_content: str
+    related_channel_name: str
+
 class MessageInfo(BaseModel):
     message_id: str
     content: str
     sender_id: str
     sender_handle: str
-    channel_name: str
     timestamp: str
     likes: int
     channel_id: str
+    channel_name: str
+
+class MessageSummary(BaseModel):
+    message_id: str
+    content: str
+    sender_handle: str
     channel_name: str
 
 class LikeRequestModel(BaseModel):

@@ -1,7 +1,8 @@
+import time
 from typing import Dict, List, Optional
 import aiosqlite
 from consts import ATTACHMENT_URL_BASE, VIDEO_EXT_LIST
-from models import AttachmentInfo, MessageInfo
+from models import AttachmentInfo, AttachmentSummary, MessageInfo, MessageSummary
 
 conn = None
 
@@ -44,9 +45,10 @@ async def get_random_attachment(video_only: bool = False) -> AttachmentInfo:
     )
 
 
-async def get_random_message() -> MessageInfo:
+async def get_random_message(min_length: int = 1) -> MessageInfo:
     async with conn.execute(
-        "SELECT message_id, content, channel_name, author_id, author_name, timestamp, channel_id FROM messages WHERE message_id IN (SELECT message_id FROM messages WHERE valid_length = TRUE ORDER BY RANDOM() LIMIT 1)"
+        "SELECT message_id, content, channel_name, author_id, author_name, timestamp, channel_id FROM messages WHERE message_id IN (SELECT message_id FROM messages WHERE content_length >= ? ORDER BY RANDOM() LIMIT 1)",
+        (min_length,),
     ) as cursor:
         row = await cursor.fetchone()
 
@@ -115,17 +117,35 @@ async def get_attachment(attachment_id: int) -> Optional[AttachmentInfo]:
 
 async def get_likes_for_user(discord_id: str) -> Dict[str, List[str]]:
     async with conn.execute(
-        f"SELECT attachment_id FROM likes WHERE discord_id = {int(discord_id)}"
+        f"SELECT attachment_id, file_name, messages.author_name, messages.content, messages.channel_name FROM likes LEFT JOIN attachments ON likes.attachment_id = attachments.id LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE discord_id = {int(discord_id)} ORDER BY likes.timestamp DESC"
     ) as cursor:
         attachment_rows = await cursor.fetchall()
 
     async with conn.execute(
-        f"SELECT message_id FROM message_likes WHERE discord_id = {int(discord_id)}"
+        f"SELECT messages.message_id, messages.content, messages.author_name, messages.channel_name FROM message_likes LEFT JOIN messages ON message_likes.message_id = messages.message_id WHERE discord_id = {int(discord_id)} ORDER BY message_likes.timestamp DESC"
     ) as cursor:
         message_rows = await cursor.fetchall()
     return {
-        "attachments": [str(row[0]) for row in attachment_rows],
-        "messages": [str(row[0]) for row in message_rows],
+        "attachments": [
+            AttachmentSummary(
+                attachment_id=str(row[0]),
+                file_name=row[1],
+                url=ATTACHMENT_URL_BASE.format(row[0], row[1]),
+                sender_handle=row[2],
+                related_message_content=row[3],
+                related_channel_name=row[4],
+            )
+            for row in attachment_rows
+        ],
+        "messages": [
+            MessageSummary(
+                message_id=str(row[0]),
+                content=row[1],
+                sender_handle=row[2],
+                channel_name=row[3],
+            )
+            for row in message_rows
+        ],
     }
 
 
@@ -148,12 +168,15 @@ async def get_message_likes(message_id: int) -> int:
             return like_row[0]
         return 0
 
+
 async def like(entity_id: int, discord_id: int, is_attachment: bool):
-    query = "INSERT INTO message_likes VALUES (?, ?) ON CONFLICT (message_id, discord_id) DO NOTHING"
+    timestamp = int(time.time())
+    query = "INSERT INTO message_likes VALUES (?, ?, ?) ON CONFLICT (message_id, discord_id) DO NOTHING"
     if is_attachment:
-        query = "INSERT INTO likes VALUES (?, ?) ON CONFLICT (attachment_id, discord_id) DO NOTHING"
-    await conn.execute(query, (entity_id, discord_id))
+        query = "INSERT INTO likes VALUES (?, ?, ?) ON CONFLICT (attachment_id, discord_id) DO NOTHING"
+    await conn.execute(query, (entity_id, discord_id, timestamp))
     await conn.commit()
+
 
 async def unlike(entity_id: int, discord_id: int, is_attachment: bool):
     query = "DELETE FROM message_likes WHERE message_id = ? AND discord_id = ?"

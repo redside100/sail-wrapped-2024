@@ -117,7 +117,7 @@ const Media = () => {
     fetchMedia();
   }, []);
 
-  // fetch/sync user likes on load
+  // fetch/sync user attachment likes on load
   useEffect(() => {
     const fetchLikes = async () => {
       const token = localStorage.getItem("access_token") ?? "";
@@ -126,7 +126,11 @@ const Media = () => {
         toast.error("Failed to get likes.");
         return;
       }
-      setUserLikes(res);
+      setUserLikes(
+        res.attachments.map(
+          ({ attachment_id }: { attachment_id: string }) => attachment_id
+        )
+      );
     };
     fetchLikes();
   }, []);
@@ -136,9 +140,7 @@ const Media = () => {
     if (!mediaInfo) {
       return;
     }
-    setLiked(
-      userLikes?.attachments?.includes(mediaInfo.attachment_id) ?? false
-    );
+    setLiked(userLikes?.includes(mediaInfo.attachment_id) ?? false);
     setLikeAdjustment(0);
   }, [mediaInfo?.attachment_id]);
 
