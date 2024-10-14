@@ -21,6 +21,8 @@ import { COLORS, SAIL_MSG_URL, VIDEO_EXT_LIST } from "../consts";
 import { Favorite, FavoriteBorder } from "@mui/icons-material";
 import moment from "moment";
 import { useParams } from "react-router-dom";
+import LinkIcon from "@mui/icons-material/Link";
+
 const MediaContainer = ({
   isVideo,
   url,
@@ -275,27 +277,14 @@ const Media = () => {
                   <Link
                     color={COLORS.LINK}
                     href={`${SAIL_MSG_URL}/${mediaInfo.related_channel_id}/${mediaInfo.related_message_id}`}
-                    target="_blank"
-                    rel="noopener"
                   >
                     #{mediaInfo.related_channel_name}
                   </Link>
                 </Tooltip>
               </Typography>
-              <Box display="flex" justifyContent="center" gap={1}>
-                {liked ? (
-                  <Favorite
-                    sx={{
-                      color: "red",
-                      cursor: "pointer",
-                      "&:hover": {
-                        opacity: 0.6,
-                      },
-                    }}
-                    onClick={() => setLike(false)}
-                  />
-                ) : (
-                  <FavoriteBorder
+              <Box display="flex" justifyContent="center" gap={2}>
+                <Tooltip title="Copy permalink">
+                  <LinkIcon
                     sx={{
                       color: "white",
                       cursor: "pointer",
@@ -303,10 +292,40 @@ const Media = () => {
                         opacity: 0.6,
                       },
                     }}
-                    onClick={() => setLike(true)}
+                    onClick={() => {
+                      navigator.clipboard.writeText(
+                        `${window.location.origin}/media/view/${mediaInfo.attachment_id}`
+                      );
+                      toast.success("Copied permalink to clipboard");
+                    }}
                   />
-                )}
-                <Typography>{mediaInfo.likes + likeAdjustment}</Typography>
+                </Tooltip>
+                <Box display="flex" gap={1}>
+                  {liked ? (
+                    <Favorite
+                      sx={{
+                        color: "red",
+                        cursor: "pointer",
+                        "&:hover": {
+                          opacity: 0.6,
+                        },
+                      }}
+                      onClick={() => setLike(false)}
+                    />
+                  ) : (
+                    <FavoriteBorder
+                      sx={{
+                        color: "white",
+                        cursor: "pointer",
+                        "&:hover": {
+                          opacity: 0.6,
+                        },
+                      }}
+                      onClick={() => setLike(true)}
+                    />
+                  )}
+                  <Typography>{mediaInfo.likes + likeAdjustment}</Typography>
+                </Box>
               </Box>
             </Stack>
           )}

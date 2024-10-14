@@ -108,4 +108,4 @@ export const VIDEO_EXT_LIST = [
   ".mod",
 ]
 
-export const SAIL_MSG_URL = "https://discord.com/channels/169611319501258753"
+export const SAIL_MSG_URL = "discord://discord.com/channels/169611319501258753"
