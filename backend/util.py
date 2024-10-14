@@ -69,4 +69,4 @@ async def refresh_token(session: aiohttp.ClientSession, refresh_token: str):
 def check_token(token_cache: dict, token: str):
 
     if token not in token_cache:
-        raise HTTPException(status_code=401, detail="Token expired or missing. Please request a new one.")
+        raise HTTPException(status_code=401, detail="Token expired or missing. Please login again.")

@@ -20,6 +20,8 @@ class AttachmentInfo(BaseModel):
     timestamp: str
     likes: int
     related_message_id: str
+    related_channel_id: str
+    related_channel_name: str
     related_message_content: str
 
 class MessageInfo(BaseModel):
@@ -30,6 +32,12 @@ class MessageInfo(BaseModel):
     channel_name: str
     timestamp: str
     likes: int
+    channel_id: str
+    channel_name: str
+
+class LikeRequestModel(BaseModel):
+    id: str
+    is_attachment: bool
 
 class TokenRequestModel(BaseModel):
     code: str

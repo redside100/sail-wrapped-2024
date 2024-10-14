@@ -15,12 +15,12 @@ async def get_random_attachment(video_only: bool = False) -> AttachmentInfo:
     where_clause = f"lower(extension) IN ({', '.join(['?' for _ in VIDEO_EXT_LIST])})"
     if video_only:
         cursor = await conn.execute(
-            f"SELECT id, file_name, author_id AS sender_id, author_name AS sender_handle, attachments.timestamp, related_message_id, content FROM attachments LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE id IN (SELECT id FROM attachments WHERE {where_clause} ORDER BY RANDOM() LIMIT 1)",
+            f"SELECT id, file_name, author_id AS sender_id, author_name AS sender_handle, attachments.timestamp, related_message_id, channel_id, channel_name, content FROM attachments LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE id IN (SELECT id FROM attachments WHERE {where_clause} ORDER BY RANDOM() LIMIT 1)",
             VIDEO_EXT_LIST,
         )
     else:
         cursor = await conn.execute(
-            f"SELECT id, file_name, author_id AS sender_id, author_name AS sender_handle, attachments.timestamp, related_message_id, content FROM attachments LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE id IN (SELECT id FROM attachments ORDER BY RANDOM() LIMIT 1)"
+            f"SELECT id, file_name, author_id AS sender_id, author_name AS sender_handle, attachments.timestamp, related_message_id, channel_id, channel_name, content FROM attachments LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE id IN (SELECT id FROM attachments ORDER BY RANDOM() LIMIT 1)"
         )
 
     row = await cursor.fetchone()
@@ -38,13 +38,15 @@ async def get_random_attachment(video_only: bool = False) -> AttachmentInfo:
         likes=likes,
         timestamp=row[4],
         related_message_id=str(row[5]),
-        related_message_content=row[6],
+        related_channel_id=str(row[6]),
+        related_channel_name=str(row[7]),
+        related_message_content=row[8],
     )
 
 
 async def get_random_message() -> MessageInfo:
     async with conn.execute(
-        "SELECT message_id, content, channel_name, author_id, author_name, timestamp FROM messages WHERE message_id IN (SELECT message_id FROM messages WHERE valid_length = TRUE ORDER BY RANDOM() LIMIT 1)"
+        "SELECT message_id, content, channel_name, author_id, author_name, timestamp, channel_id FROM messages WHERE message_id IN (SELECT message_id FROM messages WHERE valid_length = TRUE ORDER BY RANDOM() LIMIT 1)"
     ) as cursor:
         row = await cursor.fetchone()
 
@@ -58,12 +60,13 @@ async def get_random_message() -> MessageInfo:
         sender_handle=row[4],
         timestamp=row[5],
         likes=likes,
+        channel_id=row[6],
     )
 
 
 async def get_message(message_id: int) -> MessageInfo:
     async with conn.execute(
-        "SELECT message_id, content, channel_name, author_id, author_name, timestamp FROM messages WHERE message_id = ?",
+        "SELECT message_id, content, channel_name, author_id, author_name, timestamp, channel_id FROM messages WHERE message_id = ?",
         (message_id,),
     ) as cursor:
         row = await cursor.fetchone()
@@ -80,12 +83,13 @@ async def get_message(message_id: int) -> MessageInfo:
         sender_handle=row[4],
         timestamp=row[5],
         likes=likes,
+        channel_id=row[6],
     )
 
 
 async def get_attachment(attachment_id: int) -> Optional[AttachmentInfo]:
     async with conn.execute(
-        "SELECT id, file_name, author_id AS sender_id, author_name AS sender_handle, timestamp, related_message_id, content FROM attachments LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE id = ?",
+        "SELECT id, file_name, author_id AS sender_id, author_name AS sender_handle, attachments.timestamp, related_message_id, channel_id, channel_name, content FROM attachments LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE id = ?",
         (attachment_id,),
     ) as cursor:
         row = await cursor.fetchone()
@@ -103,7 +107,9 @@ async def get_attachment(attachment_id: int) -> Optional[AttachmentInfo]:
         likes=likes,
         timestamp=row[4],
         related_message_id=str(row[5]),
-        related_message_content=row[6],
+        related_channel_id=str(row[6]),
+        related_channel_name=str(row[7]),
+        related_message_content=row[8],
     )
 
 
@@ -118,8 +124,8 @@ async def get_likes_for_user(discord_id: str) -> Dict[str, List[str]]:
     ) as cursor:
         message_rows = await cursor.fetchall()
     return {
-        "attachments": [row[0] for row in attachment_rows],
-        "messages": [row[0] for row in message_rows],
+        "attachments": [str(row[0]) for row in attachment_rows],
+        "messages": [str(row[0]) for row in message_rows],
     }
 
 
@@ -141,3 +147,17 @@ async def get_message_likes(message_id: int) -> int:
         if like_row:
             return like_row[0]
         return 0
+
+async def like(entity_id: int, discord_id: int, is_attachment: bool):
+    query = "INSERT INTO message_likes VALUES (?, ?) ON CONFLICT (message_id, discord_id) DO NOTHING"
+    if is_attachment:
+        query = "INSERT INTO likes VALUES (?, ?) ON CONFLICT (attachment_id, discord_id) DO NOTHING"
+    await conn.execute(query, (entity_id, discord_id))
+    await conn.commit()
+
+async def unlike(entity_id: int, discord_id: int, is_attachment: bool):
+    query = "DELETE FROM message_likes WHERE message_id = ? AND discord_id = ?"
+    if is_attachment:
+        query = "DELETE FROM likes WHERE attachment_id = ? AND discord_id = ?"
+    await conn.execute(query, (entity_id, discord_id))
+    await conn.commit()

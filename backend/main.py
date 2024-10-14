@@ -3,6 +3,7 @@ import time
 from typing import Annotated
 import aiohttp
 from fastapi import FastAPI, HTTPException, Header, Path
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import async_db
 from util import (
@@ -32,6 +33,13 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/")
@@ -109,6 +117,20 @@ async def logout(token: Annotated[str | None, Header()] = None):
 ###################################
 
 
+@app.get("/info")
+async def user_info(token: Annotated[str | None, Header()] = None):
+    check_token(token_cache, token)
+    try:
+        res = await get_token_info(session, token)
+        return res["user"]
+    except aiohttp.ClientResponseError:
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=500,
+            detail="There was an issue retrieving your user information.",
+        )
+
+
 @app.get("/attachment/random")
 async def get_random_attachment(
     video_only: bool = False, token: Annotated[str | None, Header()] = None
@@ -142,13 +164,14 @@ async def get_attachment(
 ):
 
     check_token(token_cache, token)
-    return await async_db.get_attachment(attachment_id)
+    attachment = await async_db.get_attachment(attachment_id)
+    if not attachment:
+        raise HTTPException(status_code=404, detail="Attachment not found")
+    return attachment
 
 
 @app.get("/message/random")
-async def get_random_message(
-    token: Annotated[str | None, Header()] = None
-):
+async def get_random_message(token: Annotated[str | None, Header()] = None):
     check_token(token_cache, token)
     return await async_db.get_random_message()
 
@@ -158,15 +181,37 @@ async def get_message(
     message_id: Annotated[int, Path(title="The Messaged ID to retrieve")],
     token: Annotated[str | None, Header()] = None,
 ):
-
     check_token(token_cache, token)
-    return await async_db.get_message(message_id)
+    message = await async_db.get_message(message_id)
+    if not message:
+        raise HTTPException(status_code=404, detail="Message not found")
+    return message
 
 
 @app.get("/likes")
 async def get_user_likes(token: Annotated[str | None, Header()] = None):
     check_token(token_cache, token)
     return await async_db.get_likes_for_user(token_cache[token])
+
+
+@app.post("/like")
+async def like(
+    request: LikeRequestModel, token: Annotated[str | None, Header()] = None
+):
+    check_token(token_cache, token)
+    discord_id = token_cache[token]
+    await async_db.like(request.id, discord_id, request.is_attachment)
+    return {"message": "Success"}
+
+
+@app.post("/unlike")
+async def like(
+    request: LikeRequestModel, token: Annotated[str | None, Header()] = None
+):
+    check_token(token_cache, token)
+    discord_id = token_cache[token]
+    await async_db.unlike(request.id, discord_id, request.is_attachment)
+    return {"message": "Success"}
 
 
 if __name__ == "__main__":

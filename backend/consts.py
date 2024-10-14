@@ -3,9 +3,9 @@ import os
 DISCORD_API_ENDPOINT = "https://discord.com/api/v10"
 CLIENT_ID = "1293425051881832520"
 REDIRECT_URI = (
-    "https://sw.redside.moe/login"
+    "https://sw.redside.moe/"
     if os.environ.get("ENV", "local") == "production"
-    else "http://localhost:3000/login"
+    else "http://localhost:3000/"
 )
 CLIENT_SECRET = ""
 VIDEO_EXT_LIST = [
