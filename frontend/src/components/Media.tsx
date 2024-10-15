@@ -200,16 +200,13 @@ const Media = () => {
     }
     setLiked(like);
     setUserLikes((prev: any) => {
-      const newAttachments = new Set(prev?.attachments);
+      const newAttachments = new Set(prev);
       if (like) {
         newAttachments.add(mediaInfo.attachment_id);
       } else {
         newAttachments.delete(mediaInfo.attachment_id);
       }
-      return {
-        attachments: [...newAttachments],
-        messages: prev?.messages,
-      };
+      return [...newAttachments];
     });
     setLikeAdjustment((prev) => prev + (like ? 1 : -1));
   };
