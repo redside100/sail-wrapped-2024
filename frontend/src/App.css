@@ -6,3 +6,12 @@ img {
   position: absolute;
   z-index: 0;
 }
+
+.markdown code {
+  white-space: pre-wrap !important;
+}
+
+.markdown p {
+  text-wrap: wrap !important;
+  word-wrap: break-word;
+}

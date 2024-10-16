@@ -1,35 +1,41 @@
 import {
   Box,
   Button,
-  Checkbox,
   Link,
   Stack,
+  TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
 import { animated, useSpring, useSprings } from "@react-spring/web";
 import { useEffect, useMemo, useState } from "react";
 import {
-  getAttachment,
   getLikes,
-  getRandomAttachment,
+  getMessage,
+  getRandomMessage,
   sendLike,
   sendUnlike,
 } from "../api";
 import toast from "react-hot-toast";
-import { COLORS, SAIL_MSG_URL, VIDEO_EXT_LIST } from "../consts";
 import { Favorite, FavoriteBorder } from "@mui/icons-material";
-import moment from "moment";
 import { useParams } from "react-router-dom";
 import LinkIcon from "@mui/icons-material/Link";
+import ReactMarkdown from "react-markdown";
+import moment from "moment";
+import { COLORS, SAIL_MSG_URL } from "../consts";
+import remarkGfm from "remark-gfm";
 
-const MediaContainer = ({
-  isVideo,
-  url,
-}: {
-  isVideo: boolean;
-  url: string;
-}) => {
+const MessageContainer = ({ messageInfo }: { messageInfo: any }) => {
+  const messageContent = useMemo(() => {
+    if (!messageInfo) {
+      return "";
+    }
+    if (messageInfo.content.length > 512) {
+      return `${messageInfo.content.slice(0, 512)}...`;
+    }
+    return messageInfo.content;
+  }, [messageInfo?.content]);
+
   const [style, _] = useSpring(
     {
       from: {
@@ -41,49 +47,45 @@ const MediaContainer = ({
         y: 0,
       },
     },
-    [url]
+    [messageInfo?.message_id]
   );
   return (
     <animated.div style={style}>
-      {isVideo ? (
-        <Box
-          sx={{
-            boxShadow: "0px 0px 30px rgba(255, 255, 255, 0.4);",
-          }}
-          component="video"
-          onLoadStart={(e: any) => {
-            e.target.volume = 0.5;
-          }}
-          src={url}
-          controls
-          autoPlay
-          style={{
-            maxWidth: 800,
-            maxHeight: 400,
-          }}
-          loop
-        />
-      ) : (
-        <Box
-          sx={{
-            boxShadow: "0px 0px 30px rgba(255, 255, 255, 0.4);",
-          }}
-          component="img"
-          src={url}
-          style={{
-            maxWidth: 800,
-            maxHeight: 400,
-          }}
-        />
-      )}
+      <Box
+        maxWidth={800}
+        sx={{ backgroundColor: "rgba(0, 0, 0, 0.2)" }}
+        borderRadius={2}
+        p={3}
+      >
+        <Typography>
+          <ReactMarkdown
+            className="markdown"
+            remarkPlugins={[remarkGfm]}
+            components={{
+              a: (props: any) => (
+                <Link
+                  color={COLORS.LINK}
+                  href={props.href}
+                  target="_blank"
+                  rel="noopener"
+                >
+                  {props.href}
+                </Link>
+              ),
+            }}
+          >
+            {messageContent}
+          </ReactMarkdown>
+        </Typography>
+      </Box>
     </animated.div>
   );
 };
 
-const Media = () => {
-  const { viewAttachmentId } = useParams();
-  const [videoOnly, setVideoOnly] = useState(false);
+const Messages = () => {
+  const { viewMessageId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
+  const [minLength, setMinLength] = useState<number | null>(8);
   const [likeAdjustment, setLikeAdjustment] = useState(0);
   const [style, _] = useSprings(3, (idx: number) => ({
     from: {
@@ -97,27 +99,27 @@ const Media = () => {
     delay: idx * 100,
   }));
 
-  const [mediaInfo, setMediaInfo] = useState<any>(null);
+  const [messageInfo, setMessageInfo] = useState<any>(null);
   const [userLikes, setUserLikes] = useState<any>(null);
   const [liked, setLiked] = useState(false);
 
   useEffect(() => {
-    if (!viewAttachmentId) {
+    if (!viewMessageId) {
       return;
     }
-    const fetchMedia = async () => {
+    const fetchMessage = async () => {
       const token = localStorage.getItem("access_token") ?? "";
-      const [res, status] = await getAttachment(token, viewAttachmentId);
+      const [res, status] = await getMessage(token, viewMessageId);
       if (status !== 200) {
-        toast.error("Failed to get media.");
+        toast.error("Failed to get message.");
         return;
       }
-      setMediaInfo(res);
+      setMessageInfo(res);
     };
-    fetchMedia();
+    fetchMessage();
   }, []);
 
-  // fetch/sync user attachment likes on load
+  // fetch/sync user message likes on load
   useEffect(() => {
     const fetchLikes = async () => {
       const token = localStorage.getItem("access_token") ?? "";
@@ -127,9 +129,7 @@ const Media = () => {
         return;
       }
       setUserLikes(
-        res.attachments.map(
-          ({ attachment_id }: { attachment_id: string }) => attachment_id
-        )
+        res.messages.map(({ message_id }: { message_id: string }) => message_id)
       );
     };
     fetchLikes();
@@ -137,77 +137,55 @@ const Media = () => {
 
   // load like state from user likes
   useEffect(() => {
-    if (!mediaInfo) {
+    if (!messageInfo) {
       return;
     }
-    setLiked(userLikes?.includes(mediaInfo.attachment_id) ?? false);
+    setLiked(userLikes?.includes(messageInfo.message_id) ?? false);
     setLikeAdjustment(0);
-  }, [mediaInfo?.attachment_id]);
+  }, [messageInfo?.message_id]);
 
-  const isVideo = useMemo(() => {
-    if (!mediaInfo) {
-      return false;
-    }
-    const fileNameParts = mediaInfo?.file_name?.toLowerCase()?.split(".") ?? [
-      "",
-    ];
-    return VIDEO_EXT_LIST.includes(
-      `.${fileNameParts[fileNameParts.length - 1]}`
-    );
-  }, [mediaInfo?.file_name]);
-
-  const mediaCaption = useMemo(() => {
-    if (!mediaInfo) {
-      return "";
-    }
-    if (mediaInfo.related_message_content.length > 50) {
-      return `${mediaInfo.related_message_content.slice(0, 50)}...`;
-    }
-    return mediaInfo.related_message_content;
-  }, [mediaInfo?.related_message_content]);
-
-  const rollMedia = async () => {
+  const rollMessage = async () => {
     const token = localStorage.getItem("access_token") ?? "";
-    setMediaInfo(null);
+    setMessageInfo(null);
     setIsLoading(true);
-    const [res, status] = await getRandomAttachment(token, videoOnly);
+    const [res, status] = await getRandomMessage(token, minLength ?? 8);
     if (status !== 200) {
-      toast.error(`Failed to fetch media. Reason: ${res.detail}`);
+      toast.error(`Failed to fetch message. Reason: ${res.detail}`);
       setIsLoading(false);
       return;
     }
-    setMediaInfo(res);
+    setMessageInfo(res);
     setIsLoading(false);
   };
 
   const setLike = async (like: boolean) => {
     const token = localStorage.getItem("access_token") ?? "";
     if (like) {
-      const [_, status] = await sendLike(token, mediaInfo.attachment_id, true);
+      const [_, status] = await sendLike(token, messageInfo.message_id, false);
       if (status !== 200) {
-        toast("Failed to like attachment.");
+        toast("Failed to like message.");
         return;
       }
     } else {
       const [_, status] = await sendUnlike(
         token,
-        mediaInfo.attachment_id,
-        true
+        messageInfo.message_id,
+        false
       );
       if (status !== 200) {
-        toast("Failed to unlike attachment.");
+        toast("Failed to unlike message.");
         return;
       }
     }
     setLiked(like);
     setUserLikes((prev: any) => {
-      const newAttachments = new Set(prev);
+      const newMessages = new Set(prev);
       if (like) {
-        newAttachments.add(mediaInfo.attachment_id);
+        newMessages.add(messageInfo.message_id);
       } else {
-        newAttachments.delete(mediaInfo.attachment_id);
+        newMessages.delete(messageInfo.message_id);
       }
-      return [...newAttachments];
+      return [...newMessages];
     });
     setLikeAdjustment((prev) => prev + (like ? 1 : -1));
   };
@@ -216,72 +194,84 @@ const Media = () => {
     <Stack justifyContent="center" alignItems="center" p={3}>
       <animated.div style={style[0]}>
         <Typography variant="h3" mt={2}>
-          Media
+          Messages
         </Typography>
       </animated.div>
       <animated.div style={style[1]}>
-        <Typography>Explore random attachments sent on Sail</Typography>
+        <Typography>Explore random messages sent on Sail</Typography>
       </animated.div>
       <animated.div style={style[2]}>
         <Stack mt={3} justifyContent="center" gap={1}>
-          {!viewAttachmentId && (
+          {!viewMessageId && (
             <>
               <Button
                 variant="contained"
-                onClick={rollMedia}
+                onClick={rollMessage}
                 sx={{
                   width: 150,
                   height: 50,
                   alignSelf: "center",
                 }}
-                disabled={isLoading}
+                disabled={isLoading || minLength == null || minLength % 1 !== 0}
               >
                 Roll
               </Button>
               <Box display="flex" alignItems="center" justifyContent="center">
-                <Checkbox
-                  sx={{ color: "white", p: 0 }}
-                  value={videoOnly}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setVideoOnly(e.target.checked)
-                  }
+                <TextField
+                  label="Min Length"
+                  type="number"
+                  variant="filled"
+                  value={minLength ?? ""}
+                  sx={{
+                    width: 150,
+                    "& input[type=number]::-webkit-outer-spin-button": {
+                      display: "none",
+                      margin: 0,
+                    },
+                    "& input[type=number]::-webkit-inner-spin-button": {
+                      display: "none",
+                      margin: 0,
+                    },
+                  }}
+                  slotProps={{
+                    htmlInput: {
+                      style: {
+                        color: "white",
+                      },
+                    },
+                  }}
+                  onChange={(e) => {
+                    if (e.target.value === "") {
+                      setMinLength(null);
+                      return;
+                    }
+
+                    setMinLength(Number(e.target.value));
+                  }}
                 />
-                <Typography ml={1}>Videos Only</Typography>
               </Box>
             </>
           )}
-          {mediaInfo && (
+          {messageInfo && (
             <Stack gap={1} mt={1} justifyContent="center" alignItems="center">
-              {mediaCaption && (
-                <Typography textAlign="center">
-                  <em>{mediaCaption}</em>
-                </Typography>
-              )}
-              <Box
-                maxWidth={800}
-                maxHeight={400}
-                display="flex"
-                justifyContent="center"
-              >
-                <MediaContainer isVideo={isVideo} url={mediaInfo.url} />
-              </Box>
+              <MessageContainer messageInfo={messageInfo} />
               <Typography textAlign="center">
-                {moment(mediaInfo.timestamp).format(
+                {moment(messageInfo.timestamp * 1000).format(
                   "YYYY-MM-DD [at] h:mm A"
                 )}
               </Typography>
               <Typography textAlign="center">
                 Sent by{" "}
-                <Link color={COLORS.LINK}>@{mediaInfo.sender_handle}</Link> in{" "}
+                <Link color={COLORS.LINK}>@{messageInfo.sender_handle}</Link> in{" "}
                 <Tooltip title="Click to view in Discord">
                   <Link
                     color={COLORS.LINK}
-                    href={`${SAIL_MSG_URL}/${mediaInfo.related_channel_id}/${mediaInfo.related_message_id}`}
+                    href={`${SAIL_MSG_URL}/${messageInfo.channel_id}/${messageInfo.message_id}`}
                   >
-                    #{mediaInfo.related_channel_name}
+                    #{messageInfo.channel_name}
                   </Link>
                 </Tooltip>
-              </Typography>
+              </Typography>{" "}
               <Box display="flex" justifyContent="center" gap={2}>
                 <Tooltip title="Copy permalink">
                   <LinkIcon
@@ -294,7 +284,7 @@ const Media = () => {
                     }}
                     onClick={() => {
                       navigator.clipboard.writeText(
-                        `${window.location.origin}/media/view/${mediaInfo.attachment_id}`
+                        `${window.location.origin}/messages/view/${messageInfo.message_id}`
                       );
                       toast.success("Copied permalink to clipboard");
                     }}
@@ -324,7 +314,7 @@ const Media = () => {
                       onClick={() => setLike(true)}
                     />
                   )}
-                  <Typography>{mediaInfo.likes + likeAdjustment}</Typography>
+                  <Typography>{messageInfo.likes + likeAdjustment}</Typography>
                 </Box>
               </Box>
             </Stack>
@@ -334,4 +324,4 @@ const Media = () => {
     </Stack>
   );
 };
-export default Media;
+export default Messages;

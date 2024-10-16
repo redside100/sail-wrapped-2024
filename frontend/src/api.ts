@@ -71,6 +71,34 @@ export const getAttachment = async (token: string, attachmentId: string) => {
   return [await res.json(), res.status];
 };
 
+export const getRandomMessage = async (
+  token: string,
+  minLength: number,
+) => {
+  const res = await fetch(
+    `${API_BASE}/message/random?min_length=${minLength}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        token,
+      },
+    }
+  );
+  return [await res.json(), res.status];
+};
+
+export const getMessage = async (token: string, messageId: string) => {
+  const res = await fetch(`${API_BASE}/message/view/${messageId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      token,
+    },
+  });
+  return [await res.json(), res.status];
+};
+
 export const getLikes = async (token: string) => {
   const res = await fetch(`${API_BASE}/likes`, {
     method: "GET",

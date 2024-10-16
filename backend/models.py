@@ -37,7 +37,7 @@ class MessageInfo(BaseModel):
     content: str
     sender_id: str
     sender_handle: str
-    timestamp: str
+    timestamp: int
     likes: int
     channel_id: str
     channel_name: str

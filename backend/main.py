@@ -146,24 +146,6 @@ async def get_attachment(
 ):
 
     check_token(token_cache, token)
-    return await async_db.get_attachment(attachment_id)
-
-
-@app.get("/attachment/random")
-async def get_random_attachment(
-    video_only: bool = False, token: Annotated[str | None, Header()] = None
-):
-    check_token(token_cache, token)
-    return await async_db.get_random_attachment(video_only)
-
-
-@app.get("/attachment/view/{attachment_id}")
-async def get_attachment(
-    attachment_id: Annotated[int, Path(title="The Attachment ID to retrieve")],
-    token: Annotated[str | None, Header()] = None,
-):
-
-    check_token(token_cache, token)
     attachment = await async_db.get_attachment(attachment_id)
     if not attachment:
         raise HTTPException(status_code=404, detail="Attachment not found")
@@ -172,14 +154,21 @@ async def get_attachment(
 
 @app.get("/message/random")
 async def get_random_message(
-    min_length: Annotated[int, Path(title="The minimum length of the message.")],
+    min_length: int,
     token: Annotated[str | None, Header()] = None,
 ):
     check_token(token_cache, token)
     if min_length < 1:
-        raise HTTPException(status_code=400, detail="The minimum length must be at least 1.")
-    
-    return await async_db.get_random_message(min_length=min_length)
+        raise HTTPException(
+            status_code=400, detail="The minimum length must be at least 1."
+        )
+
+    message = await async_db.get_random_message(min_length=min_length)
+    if not message:
+        raise HTTPException(
+            status_code=404, detail="There are no messages with that minimum length."
+        )
+    return message
 
 
 @app.get("/message/view/{message_id}")

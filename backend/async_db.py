@@ -52,6 +52,9 @@ async def get_random_message(min_length: int = 1) -> MessageInfo:
     ) as cursor:
         row = await cursor.fetchone()
 
+    if not row:
+        return None
+
     message_id = int(row[0])
     likes = await get_message_likes(message_id)
     return MessageInfo(
@@ -62,7 +65,7 @@ async def get_random_message(min_length: int = 1) -> MessageInfo:
         sender_handle=row[4],
         timestamp=row[5],
         likes=likes,
-        channel_id=row[6],
+        channel_id=str(row[6]),
     )
 
 
@@ -85,7 +88,7 @@ async def get_message(message_id: int) -> MessageInfo:
         sender_handle=row[4],
         timestamp=row[5],
         likes=likes,
-        channel_id=row[6],
+        channel_id=str(row[6]),
     )
 
 
