@@ -18,10 +18,11 @@ import {
 } from "../api";
 import toast from "react-hot-toast";
 import { COLORS, SAIL_MSG_URL, VIDEO_EXT_LIST } from "../consts";
-import { Favorite, FavoriteBorder } from "@mui/icons-material";
+import { Favorite, FavoriteBorder, PermMedia } from "@mui/icons-material";
 import moment from "moment";
 import { useParams } from "react-router-dom";
 import LinkIcon from "@mui/icons-material/Link";
+import { getTruncatedString } from "../util";
 
 const MediaContainer = ({
   isVideo,
@@ -99,6 +100,7 @@ const Media = () => {
 
   const [mediaInfo, setMediaInfo] = useState<any>(null);
   const [userLikes, setUserLikes] = useState<any>(null);
+  const [fetchedInfo, setFetchedInfo] = useState<any>(null);
   const [liked, setLiked] = useState(false);
 
   useEffect(() => {
@@ -126,11 +128,11 @@ const Media = () => {
         toast.error("Failed to get likes.");
         return;
       }
-      setUserLikes(
-        res.attachments.map(
-          ({ attachment_id }: { attachment_id: string }) => attachment_id
-        )
+      const likes = res.attachments.map(
+        ({ attachment_id }: { attachment_id: string }) => attachment_id
       );
+      setUserLikes(likes);
+      setFetchedInfo(likes);
     };
     fetchLikes();
   }, []);
@@ -142,7 +144,7 @@ const Media = () => {
     }
     setLiked(userLikes?.includes(mediaInfo.attachment_id) ?? false);
     setLikeAdjustment(0);
-  }, [mediaInfo?.attachment_id]);
+  }, [mediaInfo?.attachment_id, fetchedInfo]);
 
   const isVideo = useMemo(() => {
     if (!mediaInfo) {
@@ -160,10 +162,7 @@ const Media = () => {
     if (!mediaInfo) {
       return "";
     }
-    if (mediaInfo.related_message_content.length > 50) {
-      return `${mediaInfo.related_message_content.slice(0, 50)}...`;
-    }
-    return mediaInfo.related_message_content;
+    return getTruncatedString(mediaInfo.related_message_content, 50);
   }, [mediaInfo?.related_message_content]);
 
   const rollMedia = async () => {
@@ -215,9 +214,10 @@ const Media = () => {
   return (
     <Stack justifyContent="center" alignItems="center" p={3}>
       <animated.div style={style[0]}>
-        <Typography variant="h3" mt={2}>
-          Media
-        </Typography>
+        <Box display="flex" gap={1} alignItems="center" mt={2}>
+          <PermMedia sx={{ color: "white", fontSize: 40 }} />
+          <Typography variant="h3">Media</Typography>
+        </Box>
       </animated.div>
       <animated.div style={style[1]}>
         <Typography>Explore random attachments sent on Sail</Typography>
@@ -266,9 +266,7 @@ const Media = () => {
                 <MediaContainer isVideo={isVideo} url={mediaInfo.url} />
               </Box>
               <Typography textAlign="center">
-                {moment(mediaInfo.timestamp).format(
-                  "YYYY-MM-DD [at] h:mm A"
-                )}
+                {moment(mediaInfo.timestamp).format("YYYY-MM-DD [at] h:mm A")}
               </Typography>
               <Typography textAlign="center">
                 Sent by{" "}

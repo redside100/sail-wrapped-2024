@@ -6,7 +6,7 @@ import { getInfo, login, refresh } from "./api";
 import moment from "moment";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
-import { PARTICLE_OPTIONS } from "./consts";
+import { COLORS, PARTICLE_OPTIONS } from "./consts";
 
 export const UserContext = createContext<any>({
   user: {
@@ -22,11 +22,13 @@ function App() {
   const theme = createTheme({
     palette: {
       mode: "light",
+      primary: { main: COLORS.BLURPLE },
+      secondary: { main: COLORS.LINK },
     },
     typography: {
       fontFamily: "Nunito",
       allVariants: {
-        color: "#ffffff"
+        color: "#ffffff",
       },
       button: {
         textTransform: "none",

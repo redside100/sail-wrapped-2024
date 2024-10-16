@@ -17,23 +17,21 @@ import {
   sendUnlike,
 } from "../api";
 import toast from "react-hot-toast";
-import { Favorite, FavoriteBorder } from "@mui/icons-material";
+import { Favorite, FavoriteBorder, Message } from "@mui/icons-material";
 import { useParams } from "react-router-dom";
 import LinkIcon from "@mui/icons-material/Link";
 import ReactMarkdown from "react-markdown";
 import moment from "moment";
 import { COLORS, SAIL_MSG_URL } from "../consts";
 import remarkGfm from "remark-gfm";
+import { getTruncatedString } from "../util";
 
 const MessageContainer = ({ messageInfo }: { messageInfo: any }) => {
   const messageContent = useMemo(() => {
     if (!messageInfo) {
       return "";
     }
-    if (messageInfo.content.length > 512) {
-      return `${messageInfo.content.slice(0, 512)}...`;
-    }
-    return messageInfo.content;
+    return getTruncatedString(messageInfo.content, 512);
   }, [messageInfo?.content]);
 
   const [style, _] = useSpring(
@@ -85,7 +83,7 @@ const MessageContainer = ({ messageInfo }: { messageInfo: any }) => {
 const Messages = () => {
   const { viewMessageId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
-  const [minLength, setMinLength] = useState<number | null>(8);
+  const [minLength, setMinLength] = useState<number | null>(12);
   const [likeAdjustment, setLikeAdjustment] = useState(0);
   const [style, _] = useSprings(3, (idx: number) => ({
     from: {
@@ -101,6 +99,7 @@ const Messages = () => {
 
   const [messageInfo, setMessageInfo] = useState<any>(null);
   const [userLikes, setUserLikes] = useState<any>(null);
+  const [fetchedInfo, setFetchedInfo] = useState<any>(null);
   const [liked, setLiked] = useState(false);
 
   useEffect(() => {
@@ -128,9 +127,11 @@ const Messages = () => {
         toast.error("Failed to get likes.");
         return;
       }
-      setUserLikes(
-        res.messages.map(({ message_id }: { message_id: string }) => message_id)
+      const likes = res.messages.map(
+        ({ message_id }: { message_id: string }) => message_id
       );
+      setUserLikes(likes);
+      setFetchedInfo(likes);
     };
     fetchLikes();
   }, []);
@@ -142,7 +143,7 @@ const Messages = () => {
     }
     setLiked(userLikes?.includes(messageInfo.message_id) ?? false);
     setLikeAdjustment(0);
-  }, [messageInfo?.message_id]);
+  }, [messageInfo?.message_id, fetchedInfo]);
 
   const rollMessage = async () => {
     const token = localStorage.getItem("access_token") ?? "";
@@ -193,9 +194,10 @@ const Messages = () => {
   return (
     <Stack justifyContent="center" alignItems="center" p={3}>
       <animated.div style={style[0]}>
-        <Typography variant="h3" mt={2}>
-          Messages
-        </Typography>
+        <Box display="flex" gap={1} alignItems="center" mt={2}>
+          <Message sx={{ color: "white", fontSize: 40 }} />
+          <Typography variant="h3">Messages</Typography>
+        </Box>
       </animated.div>
       <animated.div style={style[1]}>
         <Typography>Explore random messages sent on Sail</Typography>
@@ -221,6 +223,7 @@ const Messages = () => {
                   label="Min Length"
                   type="number"
                   variant="filled"
+                  color="secondary"
                   value={minLength ?? ""}
                   sx={{
                     width: 150,
@@ -271,7 +274,7 @@ const Messages = () => {
                     #{messageInfo.channel_name}
                   </Link>
                 </Tooltip>
-              </Typography>{" "}
+              </Typography>
               <Box display="flex" justifyContent="center" gap={2}>
                 <Tooltip title="Copy permalink">
                   <LinkIcon

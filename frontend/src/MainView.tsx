@@ -10,6 +10,7 @@ import { Link, Navigate, Route, Routes } from "react-router-dom";
 import Home from "./components/Home";
 import Media from "./components/Media";
 import Messages from "./components/Messages";
+import Likes from "./components/Likes";
 
 const MainView = () => {
   const { user, setUser } = useContext(UserContext);
@@ -130,6 +131,7 @@ const MainView = () => {
         <Route path="/media" element={<Media />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/messages/view/:viewMessageId" element={<Messages />} />
+        <Route path="/likes" element={<Likes />} />
         <Route path="*" element={<Navigate to="/" replace={true} />} />
       </Routes>
     </>
