@@ -41,7 +41,7 @@ const GenericEntry = ({
   return (
     <Box
       width="50vw"
-      height={100}
+      height={90}
       borderRadius={3}
       sx={{
         cursor: "pointer",
@@ -113,7 +113,7 @@ const GenericEntry = ({
                 }}
                 style={{
                   width: 100,
-                  height: 100,
+                  height: 90,
                 }}
                 loading="lazy"
               />
