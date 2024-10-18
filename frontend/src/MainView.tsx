@@ -69,7 +69,7 @@ const MainView = () => {
               >
                 Sail Wrapped 2024
               </Typography>
-              <Link to="/">
+              <Link to="/" style={{ textDecoration: "none" }}>
                 <Button
                   variant="text"
                   sx={{
@@ -92,7 +92,7 @@ const MainView = () => {
                   }}
                 />
               </Link>
-              <Link to="/media">
+              <Link to="/media" style={{ textDecoration: "none" }}>
                 <Button
                   variant="text"
                   sx={{
@@ -115,7 +115,7 @@ const MainView = () => {
                   }}
                 />
               </Link>
-              <Link to="/messages">
+              <Link to="/messages" style={{ textDecoration: "none" }}>
                 <Button
                   variant="text"
                   sx={{
@@ -138,7 +138,7 @@ const MainView = () => {
                   }}
                 />
               </Link>
-              <Link to="/likes">
+              <Link to="/likes" style={{ textDecoration: "none" }}>
                 <Button
                   variant="text"
                   sx={{
@@ -161,7 +161,7 @@ const MainView = () => {
                   }}
                 />
               </Link>
-              <Link to="/leaderboard">
+              <Link to="/leaderboard" style={{ textDecoration: "none" }}>
                 <Button
                   variant="text"
                   sx={{
@@ -184,7 +184,7 @@ const MainView = () => {
                   }}
                 />
               </Link>
-              <Link to="/stats">
+              <Link to="/stats" style={{ textDecoration: "none" }}>
                 <Button
                   variant="text"
                   sx={{
