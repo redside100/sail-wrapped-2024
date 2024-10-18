@@ -62,7 +62,22 @@ const LandingPage = () => {
         gap={2}
       >
         <animated.div style={logoStyle}>
-          <img src="/sail_logo.png" />
+          <Box
+            display={{
+              xs: "none",
+              sm: "block",
+            }}
+          >
+            <img src="/sail_logo.png" />
+          </Box>
+          <Box
+            display={{
+              xs: "block",
+              sm: "none",
+            }}
+          >
+            <img src="/sail_logo.png" height={135} width={300} />
+          </Box>
         </animated.div>
         <Box display="flex" gap={1}>
           <animated.div style={wrappedStyle}>

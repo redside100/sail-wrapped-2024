@@ -209,5 +209,11 @@ async def like(
     return {"message": "Success"}
 
 
+@app.get("/leaderboard")
+async def leaderboard(token: Annotated[str | None, Header()] = None):
+    check_token(token_cache, token)
+    return await async_db.get_leaderboard()
+
+
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000)

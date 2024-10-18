@@ -3,17 +3,18 @@ import { COLORS, VIDEO_EXT_LIST } from "../consts";
 import { Box, Link, Stack, Typography } from "@mui/material";
 import { getTruncatedString } from "../util";
 import { useNavigate } from "react-router-dom";
-import { VideoFile } from "@mui/icons-material";
+import { Favorite, VideoFile } from "@mui/icons-material";
 
 const GenericEntry = ({
   entryType,
   entryInfo,
-  rank,
+  likes,
   sx = {},
 }: {
   entryType: "attachment" | "message";
   entryInfo: any;
   rank?: number;
+  likes?: number;
   sx?: any;
 }) => {
   const navigate = useNavigate();
@@ -35,12 +36,15 @@ const GenericEntry = ({
     if (!entryInfo) {
       return "";
     }
-    return getTruncatedString(entryInfo.file_name, 24);
+    return getTruncatedString(entryInfo.file_name, 32);
   }, [entryInfo?.file_name]);
 
   return (
     <Box
-      width="50vw"
+      width={{
+        xs: "80vw",
+        md: "50vw",
+      }}
       height={90}
       borderRadius={3}
       sx={{
@@ -61,25 +65,42 @@ const GenericEntry = ({
         )
       }
     >
-      <Box display="flex" justifyContent="space-between" height="100%">
-        <Stack p={2}>
-          <Typography variant="h5">
-            {entryType === "attachment" && displayName}
-            {entryType === "message" && (
-              <Link color={COLORS.LINK}>@{entryInfo?.sender_handle}</Link>
-            )}
-          </Typography>
-          <Typography>
-            {entryType === "attachment" && (
-              <>
-                Sent by{" "}
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        height="100%"
+        width="100%"
+      >
+        <Box display="flex" overflow="hidden" width="100%" p={2}>
+          {likes && (
+            <Box display="flex" justifyContent="center" alignItems="center" px={1} pr={2} gap={1}>
+              <Favorite
+                sx={{
+                  color: "red",
+                }}
+              />
+              <Typography>{likes}</Typography>
+            </Box>
+          )}
+          <Stack overflow="hidden" width="100%">
+            <Typography variant="h5" noWrap>
+              {entryType === "attachment" && displayName}
+              {entryType === "message" && (
                 <Link color={COLORS.LINK}>@{entryInfo?.sender_handle}</Link>
-              </>
-            )}
-            {entryType === "message" &&
-              getTruncatedString(entryInfo?.content, 64)}
-          </Typography>
-        </Stack>
+              )}
+            </Typography>
+            <Typography noWrap>
+              {entryType === "attachment" && (
+                <>
+                  Sent by{" "}
+                  <Link color={COLORS.LINK}>@{entryInfo?.sender_handle}</Link>
+                </>
+              )}
+              {entryType === "message" &&
+                getTruncatedString(entryInfo?.content, 128)}
+            </Typography>
+          </Stack>
+        </Box>
         {entryType === "attachment" && (
           <Box
             width={100}

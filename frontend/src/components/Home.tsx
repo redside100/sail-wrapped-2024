@@ -1,4 +1,4 @@
-import { Box, Grid, Grid2, Link, Stack, Typography } from "@mui/material";
+import { Box, Grid2, Link, Stack, Typography } from "@mui/material";
 import { animated, useSpring, useSprings } from "@react-spring/web";
 import HomeButton from "./HomeButton";
 
@@ -51,8 +51,14 @@ const Home = () => {
           <Link color="#90caf9">here!</Link>
         </Typography>
       </Box>
-      <Grid2 container spacing={2} mt={6} width="40vw" justifyContent="center">
-        <Grid2 size={6}>
+      <Grid2 container spacing={2} mt={6} width={{
+        xs: "80vw",
+        sm: "40vw"
+      }} justifyContent="center">
+        <Grid2 size={{
+          xs: 12,
+          md: 6
+        }}>
           <animated.div style={buttonStyles[0]}>
             <HomeButton
               to="/media"
@@ -61,7 +67,10 @@ const Home = () => {
             />
           </animated.div>
         </Grid2>
-        <Grid2 size={6}>
+        <Grid2 size={{
+          xs: 12,
+          md: 6
+        }}>
           <animated.div style={buttonStyles[1]}>
             <HomeButton
               to="/messages"
@@ -70,16 +79,10 @@ const Home = () => {
             />
           </animated.div>
         </Grid2>
-        <Grid2 size={6}>
-          <animated.div style={buttonStyles[2]}>
-            <HomeButton
-              to="/leaderboard"
-              title="Leaderboard"
-              description="View the most notable media or messages."
-            />
-          </animated.div>
-        </Grid2>
-        <Grid2 size={6}>
+        <Grid2 size={{
+          xs: 12,
+          md: 6
+        }}>
           <animated.div style={buttonStyles[3]}>
             <HomeButton
               to="/likes"
@@ -88,7 +91,22 @@ const Home = () => {
             />
           </animated.div>
         </Grid2>
-        <Grid2 size={6}>
+        <Grid2 size={{
+          xs: 12,
+          md: 6
+        }}>
+          <animated.div style={buttonStyles[2]}>
+            <HomeButton
+              to="/leaderboard"
+              title="Leaderboard"
+              description="View the most notable media or messages."
+            />
+          </animated.div>
+        </Grid2>
+        <Grid2 size={{
+          xs: 12,
+          md: 6
+        }}>
           <animated.div style={buttonStyles[3]}>
             <HomeButton
               to="/stats"

@@ -11,7 +11,15 @@ import Home from "./components/Home";
 import Media from "./components/Media";
 import Messages from "./components/Messages";
 import Likes from "./components/Likes";
-
+import Leaderboard from "./components/Leaderboard";
+import {
+  Favorite,
+  Home as HomeIcon,
+  Insights,
+  Leaderboard as LeaderboardIcon,
+  Message,
+  PermMedia,
+} from "@mui/icons-material";
 const MainView = () => {
   const { user, setUser } = useContext(UserContext);
   if (user.isLoading) {
@@ -32,63 +40,190 @@ const MainView = () => {
             alignItems="center"
           >
             <Box alignItems="center" display="flex" gap={1}>
-              <img
-                src="/sail_icon.png"
-                width={40}
-                height={40}
-                style={{ borderRadius: 10 }}
-              />
+              <Box
+                sx={{
+                  display: {
+                    xs: "none",
+                    sm: "block",
+                  },
+                  mr: 1,
+                }}
+              >
+                <img
+                  src="/sail_icon.png"
+                  width={40}
+                  height={40}
+                  style={{ borderRadius: 10 }}
+                />
+              </Box>
               <Typography
                 variant="h4"
                 noWrap
                 sx={{
                   display: {
                     xs: "none",
-                    md: "block",
+                    lg: "block",
                   },
-                  mr: 1
+                  mr: 1,
                 }}
               >
                 Sail Wrapped 2024
               </Typography>
               <Link to="/">
-                <Button variant="text">
+                <Button
+                  variant="text"
+                  sx={{
+                    display: {
+                      xs: "none",
+                      sm: "block",
+                    },
+                  }}
+                >
                   <Typography>Home</Typography>
                 </Button>
+                <HomeIcon
+                  sx={{
+                    color: "white",
+                    display: {
+                      xs: "block",
+                      sm: "none",
+                    },
+                    p: 0.5
+                  }}
+                />
               </Link>
               <Link to="/media">
-                <Button variant="text">
+                <Button
+                  variant="text"
+                  sx={{
+                    display: {
+                      xs: "none",
+                      sm: "block",
+                    },
+                  }}
+                >
                   <Typography>Media</Typography>
                 </Button>
+                <PermMedia
+                  sx={{
+                    color: "white",
+                    display: {
+                      xs: "block",
+                      sm: "none",
+                    },
+                    p: 0.5
+                  }}
+                />
               </Link>
               <Link to="/messages">
-                <Button variant="text">
+                <Button
+                  variant="text"
+                  sx={{
+                    display: {
+                      xs: "none",
+                      sm: "block",
+                    },
+                  }}
+                >
                   <Typography>Messages</Typography>
                 </Button>
-              </Link>
-              <Link to="/leaderboard">
-                <Button variant="text">
-                  <Typography>Leaderboard</Typography>
-                </Button>
+                <Message
+                  sx={{
+                    color: "white",
+                    display: {
+                      xs: "block",
+                      sm: "none",
+                    },
+                    p: 0.5
+                  }}
+                />
               </Link>
               <Link to="/likes">
-                <Button variant="text">
+                <Button
+                  variant="text"
+                  sx={{
+                    display: {
+                      xs: "none",
+                      sm: "block",
+                    },
+                  }}
+                >
                   <Typography>Likes</Typography>
                 </Button>
+                <Favorite
+                  sx={{
+                    color: "white",
+                    display: {
+                      xs: "block",
+                      sm: "none",
+                    },
+                    p: 0.5
+                  }}
+                />
+              </Link>
+              <Link to="/leaderboard">
+                <Button
+                  variant="text"
+                  sx={{
+                    display: {
+                      xs: "none",
+                      sm: "block",
+                    },
+                  }}
+                >
+                  <Typography>Leaderboard</Typography>
+                </Button>
+                <LeaderboardIcon
+                  sx={{
+                    color: "white",
+                    display: {
+                      xs: "block",
+                      sm: "none",
+                    },
+                    p: 0.5
+                  }}
+                />
               </Link>
               <Link to="/stats">
-                <Button variant="text">
+                <Button
+                  variant="text"
+                  sx={{
+                    display: {
+                      xs: "none",
+                      sm: "block",
+                    },
+                  }}
+                >
                   <Typography>Stats</Typography>
                 </Button>
+                <Insights
+                    sx={{
+                      color: "white",
+                      display: {
+                        xs: "block",
+                        sm: "none",
+                      },
+                      p: 0.5
+                    }}
+                  />
               </Link>
             </Box>
             <Box alignItems="center" display="flex" gap={2}>
-              <img
-                src={`${DISCORD_CDN_BASE}/avatars/${user.info.id}/${user.info.avatar}.png?size=40`}
-                width={40}
-                height={40}
-                style={{ borderRadius: 20 }}
-              />
+              <Box
+                sx={{
+                  display: {
+                    xs: "none",
+                    sm: "block",
+                  },
+                }}
+              >
+                <img
+                  src={`${DISCORD_CDN_BASE}/avatars/${user.info.id}/${user.info.avatar}.png?size=40`}
+                  width={40}
+                  height={40}
+                  style={{ borderRadius: 20 }}
+                />
+              </Box>
               <Typography
                 noWrap
                 sx={{
@@ -119,7 +254,7 @@ const MainView = () => {
                 }}
                 color="error"
               >
-                Logout
+                <Typography>Logout</Typography>
               </Button>
             </Box>
           </Box>
@@ -132,6 +267,7 @@ const MainView = () => {
         <Route path="/messages" element={<Messages />} />
         <Route path="/messages/view/:viewMessageId" element={<Messages />} />
         <Route path="/likes" element={<Likes />} />
+        <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="*" element={<Navigate to="/" replace={true} />} />
       </Routes>
     </>

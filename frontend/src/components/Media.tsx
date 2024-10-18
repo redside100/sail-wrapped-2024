@@ -59,8 +59,8 @@ const MediaContainer = ({
           controls
           autoPlay
           style={{
-            maxWidth: 800,
-            maxHeight: 400,
+            maxWidth: "min(95vw, 800px)",
+            maxHeight: "min(60vh, 400px)",
           }}
           loop
         />
@@ -72,8 +72,8 @@ const MediaContainer = ({
           component="img"
           src={url}
           style={{
-            maxWidth: 800,
-            maxHeight: 400,
+            maxWidth: "min(95vw, 800px)",
+            maxHeight: "min(60vh, 400px)",
           }}
         />
       )}

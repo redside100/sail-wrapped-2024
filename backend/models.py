@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
 
 class UserInfo(BaseModel):
@@ -31,6 +31,8 @@ class AttachmentSummary(BaseModel):
     sender_handle: str
     related_message_content: str
     related_channel_name: str
+    likes: Optional[int] = None
+    rank: Optional[int] = None
 
 class MessageInfo(BaseModel):
     message_id: str
@@ -47,6 +49,8 @@ class MessageSummary(BaseModel):
     content: str
     sender_handle: str
     channel_name: str
+    likes: Optional[int] = None
+    rank: Optional[int] = None
 
 class LikeRequestModel(BaseModel):
     id: str

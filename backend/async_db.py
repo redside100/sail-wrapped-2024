@@ -3,6 +3,7 @@ from typing import Dict, List, Optional
 import aiosqlite
 from consts import ATTACHMENT_URL_BASE, VIDEO_EXT_LIST
 from models import AttachmentInfo, AttachmentSummary, MessageInfo, MessageSummary
+from cache import AsyncTTL
 
 conn = None
 
@@ -187,3 +188,99 @@ async def unlike(entity_id: int, discord_id: int, is_attachment: bool):
         query = "DELETE FROM likes WHERE attachment_id = ? AND discord_id = ?"
     await conn.execute(query, (entity_id, discord_id))
     await conn.commit()
+
+
+@AsyncTTL(time_to_live=60, maxsize=None)
+async def get_leaderboard():
+    attachment_query = """
+SELECT
+    ROW_NUMBER() OVER (
+        ORDER BY
+            like_count DESC
+    ) AS rank,
+    attachment_id,
+    file_name,
+    messages.author_name AS sender_handle,
+    content,
+    channel_name,
+    like_count
+FROM
+    (
+        SELECT
+            attachment_id,
+            COUNT(attachment_id) as like_count
+        FROM
+            likes
+        GROUP BY
+            attachment_id
+    ) al
+    LEFT JOIN attachments ON attachments.id = al.attachment_id
+    LEFT JOIN messages ON attachments.related_message_id = messages.message_id;
+"""
+
+    message_query = """
+SELECT
+    ROW_NUMBER() OVER (
+        ORDER BY
+            like_count DESC
+    ) rank,
+    messages.message_id,
+    content,
+    author_name AS sender_handle,
+    channel_name,
+    like_count
+FROM
+    (
+        SELECT
+            message_id,
+            COUNT(message_id) as like_count
+        FROM
+            message_likes
+        GROUP BY
+            message_id
+    ) ml
+    LEFT JOIN messages ON messages.message_id = ml.message_id
+"""
+
+    async with conn.execute(attachment_query) as cursor:
+        attachment_rows = await cursor.fetchall()
+    
+    if not attachment_rows:
+        attachment_rows = []
+    
+    attachment_rows.sort(key=lambda row: row[0])
+
+    async with conn.execute(message_query) as cursor:
+        message_rows = await cursor.fetchall()
+    
+    if not message_rows:
+        message_rows = []
+    
+    message_rows.sort(key=lambda row: row[0])
+
+    return {
+        "attachments": [
+            AttachmentSummary(
+                attachment_id=str(row[1]),
+                file_name=row[2],
+                url=ATTACHMENT_URL_BASE.format(row[1], row[2]),
+                sender_handle=row[3],
+                related_message_content=row[4],
+                related_channel_name=row[5],
+                likes=row[6],
+                rank=row[0]
+            )
+            for row in attachment_rows
+        ],
+        "messages": [
+            MessageSummary(
+                message_id=str(row[1]),
+                content=row[2],
+                sender_handle=row[3],
+                channel_name=row[4],
+                likes=row[5],
+                rank=row[0]
+            )
+            for row in message_rows
+        ],
+    }

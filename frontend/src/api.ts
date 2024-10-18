@@ -71,10 +71,7 @@ export const getAttachment = async (token: string, attachmentId: string) => {
   return [await res.json(), res.status];
 };
 
-export const getRandomMessage = async (
-  token: string,
-  minLength: number,
-) => {
+export const getRandomMessage = async (token: string, minLength: number) => {
   const res = await fetch(
     `${API_BASE}/message/random?min_length=${minLength}`,
     {
@@ -138,6 +135,17 @@ export const sendUnlike = async (
       token,
     },
     body: JSON.stringify({ id, is_attachment: isAttachment }),
+  });
+  return [await res.json(), res.status];
+};
+
+export const getLeaderboard = async (token: string) => {
+  const res = await fetch(`${API_BASE}/leaderboard`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      token,
+    },
   });
   return [await res.json(), res.status];
 };

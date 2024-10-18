@@ -50,7 +50,7 @@ const MessageContainer = ({ messageInfo }: { messageInfo: any }) => {
   return (
     <animated.div style={style}>
       <Box
-        maxWidth={800}
+        maxWidth="min(800px, 95vw)"
         sx={{ backgroundColor: "rgba(0, 0, 0, 0.2)" }}
         borderRadius={2}
         p={3}
