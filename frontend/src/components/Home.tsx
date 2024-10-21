@@ -14,7 +14,7 @@ const Home = () => {
     },
     delay: 50,
   });
-  const [buttonStyles,] = useSprings(5, (idx: number) => ({
+  const [buttonStyles] = useSprings(5, (idx: number) => ({
     from: {
       opacity: 0,
       y: 10,
@@ -51,14 +51,22 @@ const Home = () => {
           <Link color="#90caf9">here!</Link>
         </Typography>
       </Box>
-      <Grid2 container spacing={2} mt={6} width={{
-        xs: "80vw",
-        sm: "40vw"
-      }} justifyContent="center">
-        <Grid2 size={{
-          xs: 12,
-          md: 6
-        }}>
+      <Grid2
+        container
+        spacing={2}
+        mt={6}
+        width={{
+          xs: "80vw",
+          sm: "40vw",
+        }}
+        justifyContent="center"
+      >
+        <Grid2
+          size={{
+            xs: 12,
+            md: 6,
+          }}
+        >
           <animated.div style={buttonStyles[0]}>
             <HomeButton
               to="/media"
@@ -67,10 +75,12 @@ const Home = () => {
             />
           </animated.div>
         </Grid2>
-        <Grid2 size={{
-          xs: 12,
-          md: 6
-        }}>
+        <Grid2
+          size={{
+            xs: 12,
+            md: 6,
+          }}
+        >
           <animated.div style={buttonStyles[1]}>
             <HomeButton
               to="/messages"
@@ -79,10 +89,12 @@ const Home = () => {
             />
           </animated.div>
         </Grid2>
-        <Grid2 size={{
-          xs: 12,
-          md: 6
-        }}>
+        <Grid2
+          size={{
+            xs: 12,
+            md: 6,
+          }}
+        >
           <animated.div style={buttonStyles[2]}>
             <HomeButton
               to="/likes"
@@ -91,10 +103,12 @@ const Home = () => {
             />
           </animated.div>
         </Grid2>
-        <Grid2 size={{
-          xs: 12,
-          md: 6
-        }}>
+        <Grid2
+          size={{
+            xs: 12,
+            md: 6,
+          }}
+        >
           <animated.div style={buttonStyles[3]}>
             <HomeButton
               to="/leaderboard"
@@ -103,10 +117,12 @@ const Home = () => {
             />
           </animated.div>
         </Grid2>
-        <Grid2 size={{
-          xs: 12,
-          md: 6
-        }}>
+        <Grid2
+          size={{
+            xs: 12,
+            md: 6,
+          }}
+        >
           <animated.div style={buttonStyles[4]}>
             <HomeButton
               to="/stats"

@@ -13,10 +13,36 @@ export const LoadingAnimation = () => {
     config: {
       duration: 100,
     },
+    delay: 500, // only show animation if loading takes longer than 500 ms
+  });
+  const fadeStyle = useSpring({
+    from: {
+      opacity: 1,
+    },
+    to: [{ opacity: 0.6 }, { opacity: 1 }],
+    config: {
+      duration: 1000,
+    },
+    loop: true,
   });
   return (
     <animated.div style={fadeInStyle}>
-      <img src="/pusheen_loading.gif" height={100} width={100} />
+      <Box
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+        gap={1}
+      >
+        <img src="/pusheen_loading.gif" height={100} width={100} />
+        <Box display="flex" gap={1} alignItems="center">
+          <animated.div style={fadeStyle}>
+            <Typography color="white" className="loading">
+              Loading data...
+            </Typography>
+          </animated.div>
+        </Box>
+      </Box>
     </animated.div>
   );
 };

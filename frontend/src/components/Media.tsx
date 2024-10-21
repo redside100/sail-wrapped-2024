@@ -23,6 +23,7 @@ import moment from "moment";
 import { useParams } from "react-router-dom";
 import LinkIcon from "@mui/icons-material/Link";
 import { getTruncatedString } from "../util";
+import { LoadingAnimation } from "./LoadingPage";
 
 const MediaContainer = ({
   isVideo,
@@ -31,7 +32,7 @@ const MediaContainer = ({
   isVideo: boolean;
   url: string;
 }) => {
-  const [style,] = useSpring(
+  const [style] = useSpring(
     {
       from: {
         opacity: 0,
@@ -86,7 +87,7 @@ const Media = () => {
   const [videoOnly, setVideoOnly] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [likeAdjustment, setLikeAdjustment] = useState(0);
-  const [style,] = useSprings(3, (idx: number) => ({
+  const [style] = useSprings(3, (idx: number) => ({
     from: {
       opacity: 0,
       y: 10,
@@ -188,11 +189,7 @@ const Media = () => {
         return;
       }
     } else {
-      const [, status] = await sendUnlike(
-        token,
-        mediaInfo.attachment_id,
-        true
-      );
+      const [, status] = await sendUnlike(token, mediaInfo.attachment_id, true);
       if (status !== 200) {
         toast("Failed to unlike attachment.");
         return;
@@ -250,7 +247,12 @@ const Media = () => {
               </Box>
             </>
           )}
-          {mediaInfo && (
+          {isLoading && (
+            <Box mt={3}>
+              <LoadingAnimation />
+            </Box>
+          )}
+          {mediaInfo && !isLoading && (
             <Stack gap={1} mt={1} justifyContent="center" alignItems="center">
               {mediaCaption && (
                 <Typography textAlign="center">

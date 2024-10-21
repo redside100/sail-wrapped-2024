@@ -25,6 +25,7 @@ import moment from "moment";
 import { COLORS, SAIL_MSG_URL } from "../consts";
 import remarkGfm from "remark-gfm";
 import { getTruncatedString } from "../util";
+import { LoadingAnimation } from "./LoadingPage";
 
 const MessageContainer = ({ messageInfo }: { messageInfo: any }) => {
   const messageContent = useMemo(() => {
@@ -34,7 +35,7 @@ const MessageContainer = ({ messageInfo }: { messageInfo: any }) => {
     return getTruncatedString(messageInfo.content, 512);
   }, [messageInfo?.content]);
 
-  const [style,] = useSpring(
+  const [style] = useSpring(
     {
       from: {
         opacity: 0,
@@ -85,7 +86,7 @@ const Messages = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [minLength, setMinLength] = useState<number | null>(12);
   const [likeAdjustment, setLikeAdjustment] = useState(0);
-  const [style,] = useSprings(3, (idx: number) => ({
+  const [style] = useSprings(3, (idx: number) => ({
     from: {
       opacity: 0,
       y: 10,
@@ -168,11 +169,7 @@ const Messages = () => {
         return;
       }
     } else {
-      const [, status] = await sendUnlike(
-        token,
-        messageInfo.message_id,
-        false
-      );
+      const [, status] = await sendUnlike(token, messageInfo.message_id, false);
       if (status !== 200) {
         toast("Failed to unlike message.");
         return;
@@ -255,7 +252,12 @@ const Messages = () => {
               </Box>
             </>
           )}
-          {messageInfo && (
+          {isLoading && (
+            <Box mt={3}>
+              <LoadingAnimation />
+            </Box>
+          )}
+          {messageInfo && !isLoading && (
             <Stack gap={1} mt={1} justifyContent="center" alignItems="center">
               <MessageContainer messageInfo={messageInfo} />
               <Typography textAlign="center">

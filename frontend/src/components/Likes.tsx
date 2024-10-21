@@ -6,6 +6,7 @@ import { Box, Pagination, Stack, Tab, Tabs, Typography } from "@mui/material";
 import { Favorite } from "@mui/icons-material";
 import { usePagination } from "../util";
 import GenericEntry from "./GenericEntry";
+import { LoadingAnimation } from "./LoadingPage";
 
 const MAX_PER_PAGE = 5;
 
@@ -55,6 +56,7 @@ const Likes = () => {
   useEffect(() => {
     const fetchLikes = async () => {
       const token = localStorage.getItem("access_token") ?? "";
+      setLoading(true);
       const [res, status] = await getLikes(token);
       if (status !== 200) {
         toast.error("Failed to get likes.");
@@ -77,59 +79,66 @@ const Likes = () => {
       <animated.div style={headerStyle[1]}>
         <Typography>Your liked media and messages</Typography>
       </animated.div>
-      <Stack mt={3} alignItems="center" gap={1}>
-        <animated.div style={headerStyle[2]}>
-          <Tabs
-            value={tab}
-            onChange={(_, value) => setTab(value)}
-            indicatorColor="secondary"
-            sx={{
-              mb: 3,
-            }}
-          >
-            <Tab label={<Typography>Media</Typography>} value="Media" />
-            <Tab label={<Typography>Messages</Typography>} value="Messages" />
-          </Tabs>
-        </animated.div>
-        {pageEntities.map((entity, idx: number) => (
-          <animated.div style={entryStyle[idx]} key={idx}>
-            <GenericEntry
-              entryType={tab === "Media" ? "attachment" : "message"}
-              entryInfo={entity}
-            />
-          </animated.div>
-        ))}
-        {!loading &&
-          likes != null &&
-          (tab === "Media"
-            ? likes.attachments.length
-            : likes.messages.length) === 0 && (
-            <Box
-              sx={{ backgroundColor: "rgba(0, 0, 0, 0.2) " }}
-              p={2}
-              borderRadius={3}
+      {loading && (
+        <Box mt={3}>
+          <LoadingAnimation />
+        </Box>
+      )}
+      {!loading && (
+        <Stack mt={3} alignItems="center" gap={1}>
+          <animated.div style={headerStyle[2]}>
+            <Tabs
+              value={tab}
+              onChange={(_, value) => setTab(value)}
+              indicatorColor="secondary"
+              sx={{
+                mb: 3,
+              }}
             >
-              <Typography variant="h5">
-                You haven't liked any {tab === "Media" ? "media" : "messages"}{" "}
-                yet.
-              </Typography>
-            </Box>
+              <Tab label={<Typography>Media</Typography>} value="Media" />
+              <Tab label={<Typography>Messages</Typography>} value="Messages" />
+            </Tabs>
+          </animated.div>
+          {pageEntities.map((entity, idx: number) => (
+            <animated.div style={entryStyle[idx]} key={idx}>
+              <GenericEntry
+                entryType={tab === "Media" ? "attachment" : "message"}
+                entryInfo={entity}
+              />
+            </animated.div>
+          ))}
+          {!loading &&
+            likes != null &&
+            (tab === "Media"
+              ? likes.attachments.length
+              : likes.messages.length) === 0 && (
+              <Box
+                sx={{ backgroundColor: "rgba(0, 0, 0, 0.2) " }}
+                p={2}
+                borderRadius={3}
+              >
+                <Typography variant="h5">
+                  You haven't liked any {tab === "Media" ? "media" : "messages"}{" "}
+                  yet.
+                </Typography>
+              </Box>
+            )}
+          {totalPages > 0 && (
+            <Pagination
+              count={totalPages}
+              page={page}
+              onChange={(_, value) => setPage(value)}
+              color="primary"
+              sx={{
+                "& .MuiPaginationItem-root": {
+                  color: "#fff",
+                },
+                mt: 2,
+              }}
+            />
           )}
-        {totalPages > 0 && (
-          <Pagination
-            count={totalPages}
-            page={page}
-            onChange={(_, value) => setPage(value)}
-            color="primary"
-            sx={{
-              "& .MuiPaginationItem-root": {
-                color: "#fff",
-              },
-              mt: 2,
-            }}
-          />
-        )}
-      </Stack>
+        </Stack>
+      )}
     </Stack>
   );
 };
