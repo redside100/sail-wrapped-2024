@@ -73,7 +73,14 @@ const GenericEntry = ({
       >
         <Box display="flex" overflow="hidden" width="100%" p={2}>
           {likes && (
-            <Box display="flex" justifyContent="center" alignItems="center" px={1} pr={2} gap={1}>
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              px={1}
+              pr={2}
+              gap={1}
+            >
               <Favorite
                 sx={{
                   color: "red",
