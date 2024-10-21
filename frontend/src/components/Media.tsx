@@ -31,7 +31,7 @@ const MediaContainer = ({
   isVideo: boolean;
   url: string;
 }) => {
-  const [style, _] = useSpring(
+  const [style,] = useSpring(
     {
       from: {
         opacity: 0,
@@ -86,7 +86,7 @@ const Media = () => {
   const [videoOnly, setVideoOnly] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [likeAdjustment, setLikeAdjustment] = useState(0);
-  const [style, _] = useSprings(3, (idx: number) => ({
+  const [style,] = useSprings(3, (idx: number) => ({
     from: {
       opacity: 0,
       y: 10,
@@ -182,13 +182,13 @@ const Media = () => {
   const setLike = async (like: boolean) => {
     const token = localStorage.getItem("access_token") ?? "";
     if (like) {
-      const [_, status] = await sendLike(token, mediaInfo.attachment_id, true);
+      const [, status] = await sendLike(token, mediaInfo.attachment_id, true);
       if (status !== 200) {
         toast("Failed to like attachment.");
         return;
       }
     } else {
-      const [_, status] = await sendUnlike(
+      const [, status] = await sendUnlike(
         token,
         mediaInfo.attachment_id,
         true

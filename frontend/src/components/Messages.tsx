@@ -34,7 +34,7 @@ const MessageContainer = ({ messageInfo }: { messageInfo: any }) => {
     return getTruncatedString(messageInfo.content, 512);
   }, [messageInfo?.content]);
 
-  const [style, _] = useSpring(
+  const [style,] = useSpring(
     {
       from: {
         opacity: 0,
@@ -85,7 +85,7 @@ const Messages = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [minLength, setMinLength] = useState<number | null>(12);
   const [likeAdjustment, setLikeAdjustment] = useState(0);
-  const [style, _] = useSprings(3, (idx: number) => ({
+  const [style,] = useSprings(3, (idx: number) => ({
     from: {
       opacity: 0,
       y: 10,
@@ -162,13 +162,13 @@ const Messages = () => {
   const setLike = async (like: boolean) => {
     const token = localStorage.getItem("access_token") ?? "";
     if (like) {
-      const [_, status] = await sendLike(token, messageInfo.message_id, false);
+      const [, status] = await sendLike(token, messageInfo.message_id, false);
       if (status !== 200) {
         toast("Failed to like message.");
         return;
       }
     } else {
-      const [_, status] = await sendUnlike(
+      const [, status] = await sendUnlike(
         token,
         messageInfo.message_id,
         false

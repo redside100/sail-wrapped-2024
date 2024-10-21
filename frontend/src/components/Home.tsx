@@ -14,7 +14,7 @@ const Home = () => {
     },
     delay: 50,
   });
-  const [buttonStyles, _] = useSprings(4, (idx: number) => ({
+  const [buttonStyles,] = useSprings(5, (idx: number) => ({
     from: {
       opacity: 0,
       y: 10,
@@ -83,7 +83,7 @@ const Home = () => {
           xs: 12,
           md: 6
         }}>
-          <animated.div style={buttonStyles[3]}>
+          <animated.div style={buttonStyles[2]}>
             <HomeButton
               to="/likes"
               title="Likes"
@@ -95,7 +95,7 @@ const Home = () => {
           xs: 12,
           md: 6
         }}>
-          <animated.div style={buttonStyles[2]}>
+          <animated.div style={buttonStyles[3]}>
             <HomeButton
               to="/leaderboard"
               title="Leaderboard"
@@ -107,7 +107,7 @@ const Home = () => {
           xs: 12,
           md: 6
         }}>
-          <animated.div style={buttonStyles[3]}>
+          <animated.div style={buttonStyles[4]}>
             <HomeButton
               to="/stats"
               title="Stats"
