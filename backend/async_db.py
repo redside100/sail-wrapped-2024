@@ -2,7 +2,13 @@ import time
 from typing import Dict, List, Optional
 import aiosqlite
 from consts import ATTACHMENT_URL_BASE, VIDEO_EXT_LIST
-from models import AttachmentInfo, AttachmentSummary, MessageInfo, MessageSummary
+from models import (
+    AttachmentInfo,
+    AttachmentSummary,
+    MessageInfo,
+    MessageSummary,
+    UserStats,
+)
 from cache import AsyncTTL
 
 conn = None
@@ -244,18 +250,18 @@ FROM
 
     async with conn.execute(attachment_query) as cursor:
         attachment_rows = await cursor.fetchall()
-    
+
     if not attachment_rows:
         attachment_rows = []
-    
+
     attachment_rows.sort(key=lambda row: row[0])
 
     async with conn.execute(message_query) as cursor:
         message_rows = await cursor.fetchall()
-    
+
     if not message_rows:
         message_rows = []
-    
+
     message_rows.sort(key=lambda row: row[0])
 
     return {
@@ -268,7 +274,7 @@ FROM
                 related_message_content=row[4],
                 related_channel_name=row[5],
                 likes=row[6],
-                rank=row[0]
+                rank=row[0],
             )
             for row in attachment_rows
         ],
@@ -279,8 +285,42 @@ FROM
                 sender_handle=row[3],
                 channel_name=row[4],
                 likes=row[5],
-                rank=row[0]
+                rank=row[0],
             )
             for row in message_rows
         ],
     }
+
+
+@AsyncTTL(time_to_live=3600, maxsize=None)
+async def get_stats(discord_id: int):
+    query = """
+SELECT
+    user_nickname,
+    mentions_received,
+    mentions_given,
+    reactions_received,
+    reactions_given,
+    messages_sent,
+    attachments_sent,
+    attachments_size,
+    most_frequent_time,
+    most_mentioned_given_name,
+    most_mentioned_received_name,
+    most_mentioned_given_count,
+    most_mentioned_received_count
+FROM
+    users
+WHERE
+    user_id = ?;
+"""
+    async with conn.execute(
+        query,
+        (discord_id,),
+    ) as cursor:
+        row = await cursor.fetchone()
+
+    if not row:
+        return None
+
+    return UserStats(*row)
