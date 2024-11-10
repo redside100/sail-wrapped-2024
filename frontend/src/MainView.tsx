@@ -20,6 +20,7 @@ import {
   Message,
   PermMedia,
 } from "@mui/icons-material";
+import Stats from "./components/Stats";
 const MainView = () => {
   const { user, setUser } = useContext(UserContext);
   if (user.isLoading) {
@@ -268,6 +269,7 @@ const MainView = () => {
         <Route path="/messages/view/:viewMessageId" element={<Messages />} />
         <Route path="/likes" element={<Likes />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
+        <Route path="/stats" element={<Stats />} />
         <Route path="*" element={<Navigate to="/" replace={true} />} />
       </Routes>
     </>

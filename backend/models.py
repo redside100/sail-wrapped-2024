@@ -1,15 +1,18 @@
 from typing import List, Optional
 from pydantic import BaseModel
 
+
 class UserInfo(BaseModel):
     id: str
     username: str
     global_name: str
     avatar: str
 
+
 class SailInfo(BaseModel):
     user_info: UserInfo
     likes: List[str]
+
 
 class AttachmentInfo(BaseModel):
     attachment_id: str
@@ -24,6 +27,7 @@ class AttachmentInfo(BaseModel):
     related_channel_name: str
     related_message_content: str
 
+
 class AttachmentSummary(BaseModel):
     attachment_id: str
     file_name: str
@@ -33,6 +37,7 @@ class AttachmentSummary(BaseModel):
     related_channel_name: str
     likes: Optional[int] = None
     rank: Optional[int] = None
+
 
 class MessageInfo(BaseModel):
     message_id: str
@@ -44,6 +49,7 @@ class MessageInfo(BaseModel):
     channel_id: str
     channel_name: str
 
+
 class MessageSummary(BaseModel):
     message_id: str
     content: str
@@ -52,15 +58,19 @@ class MessageSummary(BaseModel):
     likes: Optional[int] = None
     rank: Optional[int] = None
 
+
 class LikeRequestModel(BaseModel):
     id: str
     is_attachment: bool
 
+
 class TokenRequestModel(BaseModel):
     code: str
 
+
 class RefreshTokenRequestModel(BaseModel):
     refresh_token: str
+
 
 class TokenResponseModel(BaseModel):
     access_token: str
@@ -68,8 +78,10 @@ class TokenResponseModel(BaseModel):
     exp: int
     user_info: UserInfo
 
+
 class AttachmentRequestModel(BaseModel):
     video_only: bool
+
 
 class UserStats(BaseModel):
     user_nickname: str

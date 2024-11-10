@@ -17,22 +17,22 @@ const LandingPage = () => {
   const wrappedStyle = useSpring({
     from: {
       opacity: 0,
-      x: -5,
+      y: -10,
     },
     to: {
       opacity: 1,
-      x: 0,
+      y: 0,
     },
     delay: 400,
   });
   const yearStyle = useSpring({
     from: {
       opacity: 0,
-      x: 5,
+      y: 10,
     },
     to: {
       opacity: 1,
-      x: 0,
+      y: 0,
     },
     delay: 600,
   });

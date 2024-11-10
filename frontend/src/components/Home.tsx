@@ -47,8 +47,16 @@ const Home = () => {
           A collection of the various things we've sent throughout 2024.
         </Typography>
         <Typography>
-          Want to crunch on data? Download the DB dump{" "}
-          <Link color="#90caf9">here!</Link>
+          This project is open source on{" "}
+          <Link
+            color="#90caf9"
+            href="https://github.com/redside100/sail-wrapped-2024"
+            target="_blank"
+            rel="noopener"
+          >
+            Github
+          </Link>
+          . Have fun!
         </Typography>
       </Box>
       <Grid2

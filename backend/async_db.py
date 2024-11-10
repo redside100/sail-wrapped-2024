@@ -323,4 +323,18 @@ WHERE
     if not row:
         return None
 
-    return UserStats(*row)
+    return UserStats(
+        user_nickname=row[0],
+        mentions_received=row[1],
+        mentions_given=row[2],
+        reactions_received=row[3],
+        reactions_given=row[4],
+        messages_sent=row[5],
+        attachments_sent=row[6],
+        attachments_size=row[7],
+        most_frequent_time=row[8],
+        most_mentioned_given_name=row[9],
+        most_mentioned_received_name=row[10],
+        most_mentioned_given_count=row[11],
+        most_mentioned_received_count=row[12],
+    )

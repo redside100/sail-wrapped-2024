@@ -149,3 +149,14 @@ export const getLeaderboard = async (token: string) => {
   });
   return [await res.json(), res.status];
 };
+
+export const getStats = async (token: string) => {
+  const res = await fetch(`${API_BASE}/stats`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      token,
+    },
+  });
+  return [await res.json(), res.status];
+}
