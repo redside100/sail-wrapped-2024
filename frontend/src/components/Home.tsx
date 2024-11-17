@@ -14,7 +14,7 @@ const Home = () => {
     },
     delay: 50,
   });
-  const [buttonStyles] = useSprings(5, (idx: number) => ({
+  const [buttonStyles] = useSprings(6, (idx: number) => ({
     from: {
       opacity: 0,
       y: 10,
@@ -132,6 +132,20 @@ const Home = () => {
           }}
         >
           <animated.div style={buttonStyles[4]}>
+            <HomeButton
+              to="/time-machine"
+              title="Time Machine"
+              description="See random snapshots of a date."
+            />
+          </animated.div>
+        </Grid2>
+        <Grid2
+          size={{
+            xs: 12,
+            md: 6,
+          }}
+        >
+          <animated.div style={buttonStyles[5]}>
             <HomeButton
               to="/stats"
               title="Stats"

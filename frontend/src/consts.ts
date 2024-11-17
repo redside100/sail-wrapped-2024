@@ -6,7 +6,7 @@ export const AUTH_URL =
 export const API_BASE =
   process.env.NODE_ENV === "development"
     ? "http://localhost:8000"
-    : "https://api.sw.redside.moe";
+    : "https://api-sw.redside.moe";
 export const DISCORD_CDN_BASE = "https://cdn.discordapp.com";
 
 export const COLORS = {

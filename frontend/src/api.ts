@@ -159,4 +159,15 @@ export const getStats = async (token: string) => {
     },
   });
   return [await res.json(), res.status];
-}
+};
+
+export const getTimeMachineSnapshot = async (token: string, date: string) => {
+  const res = await fetch(`${API_BASE}/time_machine/${date}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      token,
+    },
+  });
+  return [await res.json(), res.status];
+};

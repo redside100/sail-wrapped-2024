@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 import time
 from typing import Dict, List, Optional
 import aiosqlite
@@ -7,6 +8,7 @@ from models import (
     AttachmentSummary,
     MessageInfo,
     MessageSummary,
+    TimeMachineScreenshot,
     UserStats,
 )
 from cache import AsyncTTL
@@ -17,6 +19,11 @@ conn = None
 async def init():
     global conn
     conn = await aiosqlite.connect("wrapped.db")
+
+
+async def cleanup():
+    if conn and conn.is_alive():
+        await conn.close()
 
 
 async def get_random_attachment(video_only: bool = False) -> AttachmentInfo:
@@ -338,3 +345,53 @@ WHERE
         most_mentioned_given_count=row[11],
         most_mentioned_received_count=row[12],
     )
+
+
+async def get_time_machine_screenshot(date: datetime):
+    MAX_MESSAGE_COUNT = 5
+    MAX_ATTACHMENT_COUNT = 3
+    start_time = int(date.replace(tzinfo=timezone.utc).timestamp())
+    end_time = start_time + 86400
+    async with conn.execute(
+        "SELECT id, file_name, author_id AS sender_id, author_name AS sender_handle, attachments.timestamp, related_message_id, channel_id, channel_name, content FROM attachments LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE messages.timestamp >= ? AND messages.timestamp <= ? ORDER BY RANDOM() LIMIT ?",
+        (start_time, end_time, MAX_ATTACHMENT_COUNT),
+    ) as cursor:
+        rows = await cursor.fetchall()
+        attachments = [
+            AttachmentInfo(
+                attachment_id=str(row[0]),
+                file_name=row[1],
+                url=ATTACHMENT_URL_BASE.format(row[0], row[1]),
+                sender_id=str(row[2]),
+                sender_handle=row[3],
+                likes=0,
+                timestamp=row[4],
+                related_message_id=str(row[5]),
+                related_channel_id=str(row[6]),
+                related_channel_name=str(row[7]),
+                related_message_content=row[8],
+            )
+            for row in rows
+        ]
+
+    async with conn.execute(
+        "SELECT message_id, content, channel_name, author_id, author_name, timestamp, channel_id FROM messages WHERE content_length > 0 AND timestamp >= ? AND timestamp <= ? ORDER BY RANDOM() LIMIT ?",
+        (start_time, end_time, MAX_MESSAGE_COUNT),
+    ) as cursor:
+        rows = await cursor.fetchall()
+
+        messages = [
+            MessageInfo(
+                message_id=str(row[0]),
+                content=row[1],
+                channel_name=row[2],
+                sender_id=str(row[3]),
+                sender_handle=row[4],
+                timestamp=row[5],
+                likes=0,
+                channel_id=str(row[6]),
+            )
+            for row in rows
+        ]
+
+    return TimeMachineScreenshot(attachments=attachments, messages=messages)

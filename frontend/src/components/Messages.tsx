@@ -27,12 +27,21 @@ import remarkGfm from "remark-gfm";
 import { getTruncatedString } from "../util";
 import { LoadingAnimation } from "./LoadingPage";
 
-const MessageContainer = ({ messageInfo }: { messageInfo: any }) => {
+export const MessageContainer = ({
+  messageInfo,
+  maxWidth = "min(800px, 95vw)",
+  maxLength = 512,
+  ...props
+}: {
+  messageInfo: any;
+  maxWidth?: string | number;
+  maxLength?: number;
+}) => {
   const messageContent = useMemo(() => {
     if (!messageInfo) {
       return "";
     }
-    return getTruncatedString(messageInfo.content, 512);
+    return getTruncatedString(messageInfo.content, maxLength);
   }, [messageInfo?.content]);
 
   const [style] = useSpring(
@@ -51,10 +60,11 @@ const MessageContainer = ({ messageInfo }: { messageInfo: any }) => {
   return (
     <animated.div style={style}>
       <Box
-        maxWidth="min(800px, 95vw)"
+        maxWidth={maxWidth}
         sx={{ backgroundColor: "rgba(0, 0, 0, 0.2)" }}
         borderRadius={2}
         p={3}
+        {...props}
       >
         <Typography>
           <ReactMarkdown

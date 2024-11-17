@@ -20,16 +20,16 @@ from cachetools import TTLCache
 
 token_cache = TTLCache(ttl=86400 * 7, maxsize=float("inf"))
 session = None
-db = None
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
-    global session, db
+async def lifespan(_: FastAPI):
+    global session
     session = aiohttp.ClientSession()
     await async_db.init()
     yield
     await session.close()
+    await async_db.cleanup()
 
 
 app = FastAPI(lifespan=lifespan)
@@ -223,6 +223,16 @@ async def stats(token: Annotated[str | None, Header()] = None):
         raise HTTPException(status=404, detail="No stats found for user.")
 
     return stats
+
+
+@app.get("/time_machine/{date}")
+async def time_machine(
+    date: Annotated[str, Path(title="Date of snapshot in YYYY-MM-DD format")],
+    token: Annotated[str | None, Header()] = None,
+):
+    check_token(token_cache, token)
+    converted_date = datetime.strptime(date, "%Y-%m-%d")
+    return await async_db.get_time_machine_screenshot(converted_date)
 
 
 if __name__ == "__main__":

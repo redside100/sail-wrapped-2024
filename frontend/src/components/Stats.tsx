@@ -101,7 +101,7 @@ const Stats = () => {
         return;
       } else if (status !== 200) {
         toast.error("Failed to get stats.");
-        setIsLoading(false);
+        return;
       }
       setStats(res);
       setIsLoading(false);

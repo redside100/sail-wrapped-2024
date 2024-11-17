@@ -25,11 +25,17 @@ import LinkIcon from "@mui/icons-material/Link";
 import { getTruncatedString } from "../util";
 import { LoadingAnimation } from "./LoadingPage";
 
-const MediaContainer = ({
+export const MediaContainer = ({
   isVideo,
+  maxHeight = "min(60vh, 400px)",
+  maxWidth = "min(95vw, 800px)",
+  defaultVolume = 0.5,
   url,
 }: {
   isVideo: boolean;
+  maxHeight?: string;
+  maxWidth?: string;
+  defaultVolume?: number;
   url: string;
 }) => {
   const [style] = useSpring(
@@ -54,14 +60,14 @@ const MediaContainer = ({
           }}
           component="video"
           onLoadStart={(e: any) => {
-            e.target.volume = 0.5;
+            e.target.volume = defaultVolume;
           }}
           src={url}
           controls
           autoPlay
           style={{
-            maxWidth: "min(95vw, 800px)",
-            maxHeight: "min(60vh, 400px)",
+            maxWidth,
+            maxHeight,
           }}
           loop
         />
@@ -73,8 +79,8 @@ const MediaContainer = ({
           component="img"
           src={url}
           style={{
-            maxWidth: "min(95vw, 800px)",
-            maxHeight: "min(60vh, 400px)",
+            maxWidth,
+            maxHeight,
           }}
         />
       )}

@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Optional
 from pydantic import BaseModel
 
@@ -97,3 +98,7 @@ class UserStats(BaseModel):
     most_mentioned_received_name: str
     most_mentioned_given_count: int
     most_mentioned_received_count: int
+
+class TimeMachineScreenshot(BaseModel):
+    messages: List[MessageInfo]
+    attachments: List[AttachmentInfo]

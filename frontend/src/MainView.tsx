@@ -13,6 +13,7 @@ import Messages from "./components/Messages";
 import Likes from "./components/Likes";
 import Leaderboard from "./components/Leaderboard";
 import {
+  AccessTime,
   Favorite,
   Home as HomeIcon,
   Insights,
@@ -21,6 +22,7 @@ import {
   PermMedia,
 } from "@mui/icons-material";
 import Stats from "./components/Stats";
+import TimeMachine from "./components/TimeMachine";
 const MainView = () => {
   const { user, setUser } = useContext(UserContext);
   if (user.isLoading) {
@@ -45,7 +47,7 @@ const MainView = () => {
                 sx={{
                   display: {
                     xs: "none",
-                    sm: "block",
+                    md: "block",
                   },
                   mr: 1,
                 }}
@@ -89,7 +91,7 @@ const MainView = () => {
                       xs: "block",
                       sm: "none",
                     },
-                    p: 0.5
+                    p: 0.5,
                   }}
                 />
               </Link>
@@ -112,7 +114,7 @@ const MainView = () => {
                       xs: "block",
                       sm: "none",
                     },
-                    p: 0.5
+                    p: 0.5,
                   }}
                 />
               </Link>
@@ -135,7 +137,7 @@ const MainView = () => {
                       xs: "block",
                       sm: "none",
                     },
-                    p: 0.5
+                    p: 0.5,
                   }}
                 />
               </Link>
@@ -158,7 +160,7 @@ const MainView = () => {
                       xs: "block",
                       sm: "none",
                     },
-                    p: 0.5
+                    p: 0.5,
                   }}
                 />
               </Link>
@@ -181,7 +183,30 @@ const MainView = () => {
                       xs: "block",
                       sm: "none",
                     },
-                    p: 0.5
+                    p: 0.5,
+                  }}
+                />
+              </Link>
+              <Link to="/time-machine" style={{ textDecoration: "none" }}>
+                <Button
+                  variant="text"
+                  sx={{
+                    display: {
+                      xs: "none",
+                      sm: "block",
+                    },
+                  }}
+                >
+                  <Typography noWrap>Time Machine</Typography>
+                </Button>
+                <AccessTime
+                  sx={{
+                    color: "white",
+                    display: {
+                      xs: "block",
+                      sm: "none",
+                    },
+                    p: 0.5,
                   }}
                 />
               </Link>
@@ -198,15 +223,15 @@ const MainView = () => {
                   <Typography>Stats</Typography>
                 </Button>
                 <Insights
-                    sx={{
-                      color: "white",
-                      display: {
-                        xs: "block",
-                        sm: "none",
-                      },
-                      p: 0.5
-                    }}
-                  />
+                  sx={{
+                    color: "white",
+                    display: {
+                      xs: "block",
+                      sm: "none",
+                    },
+                    p: 0.5,
+                  }}
+                />
               </Link>
             </Box>
             <Box alignItems="center" display="flex" gap={2}>
@@ -269,6 +294,7 @@ const MainView = () => {
         <Route path="/messages/view/:viewMessageId" element={<Messages />} />
         <Route path="/likes" element={<Likes />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
+        <Route path="/time-machine" element={<TimeMachine />} />
         <Route path="/stats" element={<Stats />} />
         <Route path="*" element={<Navigate to="/" replace={true} />} />
       </Routes>
