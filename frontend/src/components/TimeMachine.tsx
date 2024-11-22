@@ -11,12 +11,18 @@ import { animated, easings, useSpring, useSprings } from "@react-spring/web";
 import { useMemo, useState } from "react";
 import { getTimeMachineSnapshot } from "../api";
 import toast from "react-hot-toast";
-import { AccessTime, OpenInNew } from "@mui/icons-material";
+import { AccessTime, Egg, OpenInNew } from "@mui/icons-material";
 import moment from "moment";
 import { LoadingAnimation } from "./LoadingPage";
 import { MessageContainer } from "./Messages";
-import { COLORS, SAIL_MSG_URL, VIDEO_EXT_LIST } from "../consts";
+import {
+  COLORS,
+  CONFETTI_OPTIONS,
+  SAIL_MSG_URL,
+  VIDEO_EXT_LIST,
+} from "../consts";
 import { MediaContainer } from "./Media";
+import { confetti } from "@tsparticles/confetti";
 
 const MARKS = [
   {
@@ -72,6 +78,27 @@ const MARKS = [
     label: <AccessTime sx={{ fontSize: 18 }} />,
   },
 ];
+
+const triggerConfetti = async (offsetValue: number) => {
+  switch (offsetValue) {
+    case 0:
+      await confetti(CONFETTI_OPTIONS.NEW_YEAR);
+      break;
+    case 44:
+      await confetti(CONFETTI_OPTIONS.VALENTINES_DAY);
+      break;
+    case 90:
+      await confetti(CONFETTI_OPTIONS.EASTER);
+      break;
+    case 304:
+      await confetti(CONFETTI_OPTIONS.HALLOWEEN);
+      break;
+    case 359:
+      await confetti(CONFETTI_OPTIONS.CHRISTMAS);
+      break;
+  }
+};
+
 const TimeMachine = () => {
   const [style] = useSprings(3, (idx: number) => ({
     from: {
@@ -216,6 +243,7 @@ const TimeMachine = () => {
               }
               setDateOffset(value);
               loadSnapshot(getDate(value));
+              triggerConfetti(value);
             }}
             valueLabelFormat={(value: number) => getDate(value)}
             sx={{
@@ -256,7 +284,12 @@ const TimeMachine = () => {
                           maxWidth="100%"
                         />
                         <animated.div style={fadeStyle}>
-                          <Box display="flex" gap={1} alignItems="center" justifyContent="center">
+                          <Box
+                            display="flex"
+                            gap={1}
+                            alignItems="center"
+                            justifyContent="center"
+                          >
                             <Typography textAlign="center">
                               Sent by{" "}
                               <Link color={COLORS.LINK}>
@@ -374,6 +407,11 @@ const TimeMachine = () => {
             </Box>
           )}
         </>
+      )}
+      {dateOffset === 90 && (
+        <Box display="flex" width="100%" justifyContent="flex-end" mt={3}>
+          <Egg sx={{ color: "white", cursor: "pointer" }} onClick={() => {}} />
+        </Box>
       )}
     </Stack>
   );

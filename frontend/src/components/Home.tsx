@@ -47,16 +47,16 @@ const Home = () => {
           A collection of the various things we've sent throughout 2024.
         </Typography>
         <Typography>
-          This project is open source on{" "}
+          You can view last year's Sail Wrapped{" "}
           <Link
             color="#90caf9"
-            href="https://github.com/redside100/sail-wrapped-2024"
+            href="https://sw2023.redside.moe/"
             target="_blank"
             rel="noopener"
           >
-            Github
+            here
           </Link>
-          . Have fun!
+          .
         </Typography>
       </Box>
       <Grid2
@@ -154,6 +154,20 @@ const Home = () => {
           </animated.div>
         </Grid2>
       </Grid2>
+      <Typography mt={3}>
+        <em>
+          (by the way, this project is open source on{" "}
+          <Link
+            color="#90caf9"
+            href="https://github.com/redside100/sail-wrapped-2024"
+            target="_blank"
+            rel="noopener"
+          >
+            GitHub
+          </Link>
+          !)
+        </em>
+      </Typography>
     </Stack>
   );
 };

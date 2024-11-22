@@ -106,6 +106,58 @@ export const VIDEO_EXT_LIST = [
   ".f4a",
   ".f4b",
   ".mod",
-]
+];
 
-export const SAIL_MSG_URL = "discord://discord.com/channels/169611319501258753"
+export const SAIL_MSG_URL = "discord://discord.com/channels/169611319501258753";
+
+const DEFAULT_EMOJI = {
+  flat: true,
+  particleCount: 15,
+  spread: 180,
+  scalar: 2,
+  velocity: 90,
+  gravity: 3,
+  shapes: ["emoji"],
+};
+export const CONFETTI_OPTIONS = {
+  NEW_YEAR: {
+    ...DEFAULT_EMOJI,
+    shapeOptions: {
+      emoji: {
+        value: ["🥳", "🎉", "🥂", "🎊"],
+      },
+    },
+  },
+  VALENTINES_DAY: {
+    ...DEFAULT_EMOJI,
+    shapeOptions: {
+      emoji: {
+        value: ["❤️", "🥰"],
+      },
+    },
+  },
+  EASTER: {
+    ...DEFAULT_EMOJI,
+    shapeOptions: {
+      emoji: {
+        value: ["🐇", "🥚"],
+      },
+    },
+  },
+  HALLOWEEN: {
+    ...DEFAULT_EMOJI,
+    shapeOptions: {
+      emoji: {
+        value: ["🎃", "👻", "🍬", "🦇"],
+      },
+    },
+  },
+  CHRISTMAS: {
+    ...DEFAULT_EMOJI,
+    shapeOptions: {
+      emoji: {
+        value: ["🎁", "❄️", "🌟", "🎄", "⛄"],
+      },
+    },
+  },
+};
