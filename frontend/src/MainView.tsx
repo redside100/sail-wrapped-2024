@@ -23,6 +23,7 @@ import {
 } from "@mui/icons-material";
 import Stats from "./components/Stats";
 import TimeMachine from "./components/TimeMachine";
+import Secret from "./components/Secret";
 const MainView = () => {
   const { user, setUser } = useContext(UserContext);
   if (user.isLoading) {
@@ -296,6 +297,7 @@ const MainView = () => {
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/time-machine" element={<TimeMachine />} />
         <Route path="/stats" element={<Stats />} />
+        <Route path="/super-duper-secret-page-for-cool-people" element={<Secret />} />
         <Route path="*" element={<Navigate to="/" replace={true} />} />
       </Routes>
     </>

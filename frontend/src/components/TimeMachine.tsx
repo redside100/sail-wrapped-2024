@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import { animated, easings, useSpring, useSprings } from "@react-spring/web";
-import { useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { getTimeMachineSnapshot } from "../api";
 import toast from "react-hot-toast";
 import { AccessTime, Egg, OpenInNew } from "@mui/icons-material";
@@ -17,12 +17,12 @@ import { LoadingAnimation } from "./LoadingPage";
 import { MessageContainer } from "./Messages";
 import {
   COLORS,
-  CONFETTI_OPTIONS,
   SAIL_MSG_URL,
   VIDEO_EXT_LIST,
 } from "../consts";
 import { MediaContainer } from "./Media";
-import { confetti } from "@tsparticles/confetti";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "../App";
 
 const MARKS = [
   {
@@ -79,26 +79,6 @@ const MARKS = [
   },
 ];
 
-const triggerConfetti = async (offsetValue: number) => {
-  switch (offsetValue) {
-    case 0:
-      await confetti(CONFETTI_OPTIONS.NEW_YEAR);
-      break;
-    case 44:
-      await confetti(CONFETTI_OPTIONS.VALENTINES_DAY);
-      break;
-    case 90:
-      await confetti(CONFETTI_OPTIONS.EASTER);
-      break;
-    case 304:
-      await confetti(CONFETTI_OPTIONS.HALLOWEEN);
-      break;
-    case 359:
-      await confetti(CONFETTI_OPTIONS.CHRISTMAS);
-      break;
-  }
-};
-
 const TimeMachine = () => {
   const [style] = useSprings(3, (idx: number) => ({
     from: {
@@ -115,6 +95,8 @@ const TimeMachine = () => {
   const [snapshotInfo, setSnapshotInfo] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [dateOffset, setDateOffset] = useState(0);
+  const navigate = useNavigate();
+  const { user } = useContext(UserContext);
 
   const [fadeStyle] = useSpring(
     {
@@ -243,7 +225,6 @@ const TimeMachine = () => {
               }
               setDateOffset(value);
               loadSnapshot(getDate(value));
-              triggerConfetti(value);
             }}
             valueLabelFormat={(value: number) => getDate(value)}
             sx={{
@@ -276,6 +257,7 @@ const TimeMachine = () => {
                       xs: 12,
                       md: 3,
                     }}
+                    key={`snapshot-message-${idx}`}
                   >
                     <animated.div style={snapshotStyle[idx]}>
                       <Stack>
@@ -340,6 +322,7 @@ const TimeMachine = () => {
                           xs: 12,
                           md: 3,
                         }}
+                        key={`snapshot-attachment-${idx}`}
                       >
                         <animated.div style={snapshotStyle[idx]}>
                           <Stack alignItems="center">
@@ -410,7 +393,14 @@ const TimeMachine = () => {
       )}
       {dateOffset === 90 && (
         <Box display="flex" width="100%" justifyContent="flex-end" mt={3}>
-          <Egg sx={{ color: "white", cursor: "pointer" }} onClick={() => {}} />
+          <Egg
+            sx={{ color: "white", cursor: "pointer" }}
+            onClick={() =>
+              navigate(
+                `/super-duper-secret-page-for-cool-people?user=${user.info?.id}`
+              )
+            }
+          />
         </Box>
       )}
     </Stack>
