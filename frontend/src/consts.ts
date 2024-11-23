@@ -66,6 +66,71 @@ export const PARTICLE_OPTIONS = {
     },
   },
 };
+export const PUSHEEN_PARTICLE_OPTIONS = {
+  particles: {
+    number: {
+      value: 250,
+      density: {
+        enable: true,
+      },
+    },
+    color: {
+      value: "#fff",
+    },
+    shape: {
+      type: "image",
+      options: {
+        image: [
+          {
+            src: "/pusheen_cookie_particle.png",
+          },
+          {
+            src: "/pusheen.png",
+          },
+          {
+            src: "/pusheen_donut.png",
+          },
+        ],
+      },
+    },
+    rotate: {
+      value: {
+        min: 0,
+        max: 360,
+      },
+      direction: "random",
+      move: true,
+      animation: {
+        enable: true,
+        speed: 20,
+      },
+    },
+    opacity: {
+      value: 0.2,
+    },
+    size: {
+      value: 40,
+    },
+    move: {
+      enable: true,
+      speed: 1,
+      straight: true,
+    },
+    wobble: {
+      enable: true,
+      distance: 15,
+      speed: 15,
+    },
+    zIndex: {
+      value: {
+        min: 0,
+        max: 100,
+      },
+      opacityRate: 8,
+      velocityRate: 8,
+    },
+  },
+};
 
 export const VIDEO_EXT_LIST = [
   ".webm",
