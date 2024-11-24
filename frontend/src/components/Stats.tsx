@@ -175,7 +175,7 @@ const Stats = () => {
               <StatEntry
                 renderIcon={() => <Keyboard sx={{ color: "white" }} />}
                 title="Message Frequency"
-                content={`~${(stats.messages_sent / 365).toFixed(2)} / day`}
+                content={`~${(stats.messages_sent / 366).toFixed(2)} / day`}
               />
             </animated.div>
           </Grid2>
