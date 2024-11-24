@@ -15,11 +15,7 @@ import { AccessTime, Egg, OpenInNew } from "@mui/icons-material";
 import moment from "moment";
 import { LoadingAnimation } from "./LoadingPage";
 import { MessageContainer } from "./Messages";
-import {
-  COLORS,
-  SAIL_MSG_URL,
-  VIDEO_EXT_LIST,
-} from "../consts";
+import { COLORS, SAIL_MSG_URL, VIDEO_EXT_LIST } from "../consts";
 import { MediaContainer } from "./Media";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../App";
@@ -394,7 +390,13 @@ const TimeMachine = () => {
       {dateOffset === 90 && (
         <Box display="flex" width="100%" justifyContent="flex-end" mt={3}>
           <Egg
-            sx={{ color: "white", cursor: "pointer" }}
+            sx={{
+              color: "white",
+              cursor: "pointer",
+              "&:hover": {
+                opacity: 0.6,
+              },
+            }}
             onClick={() =>
               navigate(
                 `/super-duper-secret-page-for-cool-people?user=${user.info?.id}`

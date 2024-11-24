@@ -46,10 +46,8 @@ const Secret = () => {
       </animated.div>
       <animated.div style={style[2]}>
         <Stack alignItems="center">
-          <Typography mt={3}>Thank you for being part of Sail!</Typography>
-          <Typography>
-            It's hard to believe that its already been 8 years.
-          </Typography>
+          <Typography mt={3}>Thank you for being part of Sail.</Typography>
+          <Typography>There's more memories to be made in 2025 and onwards!</Typography>
           <Button
             variant="contained"
             sx={{
