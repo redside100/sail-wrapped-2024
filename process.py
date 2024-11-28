@@ -10,7 +10,7 @@ json_files = os.listdir("export")
 file_count = len(json_files)
 conn = sqlite3.connect("backend/wrapped.db")
 
-DOWNLOAD_ATTACHMENTS = False
+DOWNLOAD_ATTACHMENTS = bool(os.environ.get("DOWNLOAD_ATTACHMENTS"))
 
 for i, file_name in enumerate(json_files):
     print(f"Processing file {i + 1}/{file_count} - {file_name}")
