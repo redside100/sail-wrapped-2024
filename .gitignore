@@ -166,3 +166,4 @@ backend/client_secret
 export/*
 attachments/*
 plans.md
+frontend/*.tsbuildinfo

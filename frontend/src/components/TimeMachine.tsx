@@ -256,7 +256,12 @@ const TimeMachine = () => {
                     key={`snapshot-message-${idx}`}
                   >
                     <animated.div style={snapshotStyle[idx]}>
-                      <Stack>
+                      <Stack sx={{
+                        maxWidth: {
+                          xs: "95vw",
+                          md: "100%"
+                        }
+                      }}>
                         <MessageContainer
                           messageInfo={message}
                           maxWidth="100%"

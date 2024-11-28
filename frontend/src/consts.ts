@@ -90,6 +90,12 @@ export const PUSHEEN_PARTICLE_OPTIONS = {
           {
             src: "/pusheen_donut.png",
           },
+          {
+            src: "/pusheen_pizza.png",
+          },
+          {
+            src: "/pusheen_burger.png",
+          }
         ],
       },
     },

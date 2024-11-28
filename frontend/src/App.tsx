@@ -25,7 +25,7 @@ function App() {
   const [pusheenMode, setPusheenMode] = useState(false);
 
   useEffect(() => {
-    setPusheenMode(Boolean(localStorage.getItem("pusheen_mode")) ?? false);
+    setPusheenMode(localStorage.getItem("pusheen_mode") === "true");
   }, []);
 
   const theme = createTheme({
