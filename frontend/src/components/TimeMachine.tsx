@@ -332,6 +332,7 @@ const TimeMachine = () => {
                               url={attachment.url}
                               defaultVolume={0}
                               maxWidth="100%"
+                              isSpoiler={attachment.file_name.startsWith("SPOILER_")}
                             />
                             <animated.div style={fadeStyle}>
                               <Box display="flex" gap={1} alignItems="center">

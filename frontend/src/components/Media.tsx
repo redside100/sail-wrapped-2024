@@ -31,12 +31,14 @@ export const MediaContainer = ({
   maxWidth = "min(95vw, 800px)",
   defaultVolume = 0.5,
   url,
+  isSpoiler = false,
 }: {
   isVideo: boolean;
   maxHeight?: string;
   maxWidth?: string;
   defaultVolume?: number;
   url: string;
+  isSpoiler?: boolean;
 }) => {
   const [style] = useSpring(
     {
@@ -51,39 +53,63 @@ export const MediaContainer = ({
     },
     [url]
   );
+  const [spoilerFilter, setSpoilerFilter] = useState(isSpoiler);
   return (
     <animated.div style={style}>
-      {isVideo ? (
-        <Box
-          sx={{
-            boxShadow: "0px 0px 30px rgba(255, 255, 255, 0.4);",
-          }}
-          component="video"
-          onLoadStart={(e: any) => {
-            e.target.volume = defaultVolume;
-          }}
-          src={url}
-          controls
-          autoPlay
-          style={{
-            maxWidth,
-            maxHeight,
-          }}
-          loop
-        />
-      ) : (
-        <Box
-          sx={{
-            boxShadow: "0px 0px 30px rgba(255, 255, 255, 0.4);",
-          }}
-          component="img"
-          src={url}
-          style={{
-            maxWidth,
-            maxHeight,
-          }}
-        />
-      )}
+      <Box position="relative">
+        {spoilerFilter && (
+          <Button
+            variant="contained"
+            sx={{
+              position: "absolute",
+              zIndex: 1,
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
+            onClick={() => setSpoilerFilter(false)}
+          >
+            Show Spoiler
+          </Button>
+        )}
+        {isVideo ? (
+          <Box
+            sx={{
+              boxShadow: "0px 0px 30px rgba(255, 255, 255, 0.4);",
+            }}
+            component="video"
+            onLoadStart={(e: any) => {
+              e.target.volume = defaultVolume;
+            }}
+            src={url}
+            controls
+            autoPlay={!spoilerFilter}
+            style={{
+              maxWidth,
+              maxHeight,
+              ...(spoilerFilter && {
+                filter: "blur(10px)",
+              }),
+            }}
+            loop
+          />
+        ) : (
+          <Box
+            sx={{
+              boxShadow: "0px 0px 30px rgba(255, 255, 255, 0.4);",
+            }}
+            component="img"
+            src={url}
+            style={{
+              maxWidth,
+              maxHeight,
+              ...(spoilerFilter && {
+                filter: "blur(10px)",
+              }),
+            }}
+          />
+        )}
+      </Box>
     </animated.div>
   );
 };
@@ -271,7 +297,11 @@ const Media = () => {
                 display="flex"
                 justifyContent="center"
               >
-                <MediaContainer isVideo={isVideo} url={mediaInfo.url} />
+                <MediaContainer
+                  isVideo={isVideo}
+                  url={mediaInfo.url}
+                  isSpoiler={mediaInfo.file_name.startsWith("SPOILER_")}
+                />
               </Box>
               <Typography textAlign="center">
                 {moment(mediaInfo.timestamp).format("YYYY-MM-DD [at] h:mm A")}
