@@ -23,4 +23,4 @@ RUN npm install -g serve
 EXPOSE 7246
 
 # Run application
-CMD serve -s build -p 7246
+CMD serve -s dist -p 7246

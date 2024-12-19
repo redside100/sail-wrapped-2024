@@ -167,3 +167,4 @@ export/*
 attachments/*
 plans.md
 frontend/*.tsbuildinfo
+docker_*.sh
