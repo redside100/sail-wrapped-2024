@@ -25,6 +25,33 @@ import {
 import Stats from "./components/Stats";
 import TimeMachine from "./components/TimeMachine";
 import Secret from "./components/Secret";
+
+const DynamicMenuItem = ({ to, text, IconComponent }: { to: string, text: string, IconComponent: any}) => (
+  <Link to={to} style={{ textDecoration: "none" }}>
+  <Button
+    variant="text"
+    sx={{
+      display: {
+        xs: "none",
+        sm: "block",
+      },
+    }}
+  >
+    <Typography noWrap>{text}</Typography>
+  </Button>
+  <IconComponent
+    sx={{
+      color: "white",
+      display: {
+        xs: "block",
+        sm: "none",
+      },
+      p: 0.5,
+    }}
+  />
+</Link>
+)
+
 const MainView = () => {
   const { user, setUser } = useContext(UserContext);
   const doLogout = async () => {
@@ -90,167 +117,13 @@ const MainView = () => {
               >
                 Sail Wrapped 2024
               </Typography>
-              <Link to="/" style={{ textDecoration: "none" }}>
-                <Button
-                  variant="text"
-                  sx={{
-                    display: {
-                      xs: "none",
-                      sm: "block",
-                    },
-                  }}
-                >
-                  <Typography>Home</Typography>
-                </Button>
-                <HomeIcon
-                  sx={{
-                    color: "white",
-                    display: {
-                      xs: "block",
-                      sm: "none",
-                    },
-                    p: 0.5,
-                  }}
-                />
-              </Link>
-              <Link to="/media" style={{ textDecoration: "none" }}>
-                <Button
-                  variant="text"
-                  sx={{
-                    display: {
-                      xs: "none",
-                      sm: "block",
-                    },
-                  }}
-                >
-                  <Typography>Media</Typography>
-                </Button>
-                <PermMedia
-                  sx={{
-                    color: "white",
-                    display: {
-                      xs: "block",
-                      sm: "none",
-                    },
-                    p: 0.5,
-                  }}
-                />
-              </Link>
-              <Link to="/messages" style={{ textDecoration: "none" }}>
-                <Button
-                  variant="text"
-                  sx={{
-                    display: {
-                      xs: "none",
-                      sm: "block",
-                    },
-                  }}
-                >
-                  <Typography>Messages</Typography>
-                </Button>
-                <Message
-                  sx={{
-                    color: "white",
-                    display: {
-                      xs: "block",
-                      sm: "none",
-                    },
-                    p: 0.5,
-                  }}
-                />
-              </Link>
-              <Link to="/likes" style={{ textDecoration: "none" }}>
-                <Button
-                  variant="text"
-                  sx={{
-                    display: {
-                      xs: "none",
-                      sm: "block",
-                    },
-                  }}
-                >
-                  <Typography>Likes</Typography>
-                </Button>
-                <Favorite
-                  sx={{
-                    color: "white",
-                    display: {
-                      xs: "block",
-                      sm: "none",
-                    },
-                    p: 0.5,
-                  }}
-                />
-              </Link>
-              <Link to="/leaderboard" style={{ textDecoration: "none" }}>
-                <Button
-                  variant="text"
-                  sx={{
-                    display: {
-                      xs: "none",
-                      sm: "block",
-                    },
-                  }}
-                >
-                  <Typography>Leaderboard</Typography>
-                </Button>
-                <LeaderboardIcon
-                  sx={{
-                    color: "white",
-                    display: {
-                      xs: "block",
-                      sm: "none",
-                    },
-                    p: 0.5,
-                  }}
-                />
-              </Link>
-              <Link to="/time-machine" style={{ textDecoration: "none" }}>
-                <Button
-                  variant="text"
-                  sx={{
-                    display: {
-                      xs: "none",
-                      sm: "block",
-                    },
-                  }}
-                >
-                  <Typography noWrap>Time Machine</Typography>
-                </Button>
-                <AccessTime
-                  sx={{
-                    color: "white",
-                    display: {
-                      xs: "block",
-                      sm: "none",
-                    },
-                    p: 0.5,
-                  }}
-                />
-              </Link>
-              <Link to="/stats" style={{ textDecoration: "none" }}>
-                <Button
-                  variant="text"
-                  sx={{
-                    display: {
-                      xs: "none",
-                      sm: "block",
-                    },
-                  }}
-                >
-                  <Typography>Stats</Typography>
-                </Button>
-                <Insights
-                  sx={{
-                    color: "white",
-                    display: {
-                      xs: "block",
-                      sm: "none",
-                    },
-                    p: 0.5,
-                  }}
-                />
-              </Link>
+              <DynamicMenuItem to="/" text="Home" IconComponent={HomeIcon} />
+              <DynamicMenuItem to="/media" text="Media" IconComponent={PermMedia} />
+              <DynamicMenuItem to="/messages" text="Messages" IconComponent={Message} />
+              <DynamicMenuItem to="/likes" text="Likes" IconComponent={Favorite} />
+              <DynamicMenuItem to="/leaderboard" text="Leaderboard" IconComponent={LeaderboardIcon} />
+              <DynamicMenuItem to="/time-machine" text="Time Machine" IconComponent={AccessTime} />
+              <DynamicMenuItem to="/stats" text="Stats" IconComponent={Insights} />
             </Box>
             <Box alignItems="center" display="flex" gap={2}>
               <Box
