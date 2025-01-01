@@ -7,10 +7,7 @@ class UserInfo(BaseModel):
     id: str
     username: str
     global_name: str
-    avatar: str = Field(
-        default_factory="https://cdn.discordapp.com/embed/avatars/0.png"
-    )
-
+    avatar: Optional[str] = "https://cdn.discordapp.com/embed/avatars/0.png"
 
 class SailInfo(BaseModel):
     user_info: UserInfo
