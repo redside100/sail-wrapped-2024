@@ -1,13 +1,15 @@
 from datetime import datetime
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class UserInfo(BaseModel):
     id: str
     username: str
     global_name: str
-    avatar: str
+    avatar: str = Field(
+        default_factory="https://cdn.discordapp.com/embed/avatars/0.png"
+    )
 
 
 class SailInfo(BaseModel):
@@ -98,6 +100,7 @@ class UserStats(BaseModel):
     most_mentioned_received_name: str
     most_mentioned_given_count: int
     most_mentioned_received_count: int
+
 
 class TimeMachineScreenshot(BaseModel):
     messages: List[MessageInfo]
