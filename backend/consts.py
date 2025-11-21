@@ -48,7 +48,9 @@ VIDEO_EXT_LIST = [
     ".f4b",
     ".mod",
 ]
-ATTACHMENT_URL_BASE = "https://api.redside.moe/static/files/sw/attachments/{}_{}"
+ATTACHMENT_URL_BASE = (
+    "https://redside.tor1.digitaloceanspaces.com/sw/2024/attachments/{}_{}"
+)
 
 with open("client_secret", "r") as f:
     CLIENT_SECRET = f.read()
