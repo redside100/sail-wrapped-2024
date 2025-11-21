@@ -4,12 +4,13 @@ CREATE TABLE IF NOT EXISTS "attachments" (
 	"related_message_id"	INTEGER,
 	"file_name"	TEXT,
 	"timestamp"	INTEGER,
-	"extension"	TEXT
+	"extension"	TEXT,
+	"year" INTEGER,
 );
 CREATE TABLE IF NOT EXISTS "likes" (
 	"attachment_id"	INTEGER,
 	"discord_id"	INTEGER,
-	"timestamp"	INTEGER
+	"timestamp"	INTEGER,
 );
 CREATE TABLE IF NOT EXISTS "message_likes" (
 	"message_id"	INTEGER,
@@ -35,6 +36,7 @@ CREATE TABLE IF NOT EXISTS "messages" (
 	"channel_id"	INTEGER,
 	"channel_name"	TEXT,
 	"content_length"	INTEGER,
+	"year" INTEGER,
 	PRIMARY KEY("message_id")
 );
 CREATE TABLE IF NOT EXISTS "users" (
@@ -55,7 +57,8 @@ CREATE TABLE IF NOT EXISTS "users" (
 	"most_mentioned_given_id"	INTEGER,
 	"most_mentioned_received_id"	INTEGER,
 	"most_mentioned_given_count"	INTEGER,
-	"most_mentioned_received_count"	INTEGER
+	"most_mentioned_received_count"	INTEGER,
+	"year" INTEGER,
 );
 CREATE UNIQUE INDEX IF NOT EXISTS "idx_attachment_id_discord_id" ON "likes" (
 	"attachment_id",

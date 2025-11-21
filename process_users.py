@@ -1,12 +1,17 @@
 import sqlite3
 import orjson
 from datetime import datetime
+import os
 
 conn = sqlite3.connect("backend/wrapped.db")
+CURRENT_YEAR = int(os.environ.get("CURRENT_YEAR", "2025"))
+
+print("Current year:", CURRENT_YEAR)
+
 all_messages = (
     conn.cursor()
     .execute(
-        "SELECT author_id, author_name, author_nickname, author_avatar_url, content, timestamp, attachments, reactions, mentions, total_reactions FROM messages ORDER BY timestamp ASC"
+        f"SELECT author_id, author_name, author_nickname, author_avatar_url, content, timestamp, attachments, reactions, mentions, total_reactions WHERE year = {CURRENT_YEAR} FROM messages ORDER BY timestamp ASC"
     )
     .fetchall()
 )
@@ -42,7 +47,7 @@ for i, row in enumerate(all_messages):
 
     if not row[0]:
         continue
-    
+
     user_id = int(row[0])
     user_name = row[1]
     user_nickname = row[2]
@@ -79,7 +84,9 @@ for i, row in enumerate(all_messages):
             reactor_avatar_url = user["avatarUrl"]
             if reactor_name == "Deleted User":
                 continue
-            init_user_if_not_exists(reactor_id, reactor_name, reactor_nickname, reactor_avatar_url)
+            init_user_if_not_exists(
+                reactor_id, reactor_name, reactor_nickname, reactor_avatar_url
+            )
             user_cache[reactor_id]["reactions_given"] += 1
 
     for mention in mentions:
@@ -92,7 +99,9 @@ for i, row in enumerate(all_messages):
         mentioned_avatar_url = mention["avatarUrl"]
         if mentioned_name == "Deleted User":
             continue
-        init_user_if_not_exists(mentioned_id, mentioned_name, mentioned_nickname, mentioned_avatar_url)
+        init_user_if_not_exists(
+            mentioned_id, mentioned_name, mentioned_nickname, mentioned_avatar_url
+        )
 
         if mentioned_id not in user_cache[user_id]["mentions_given"]:
             user_cache[user_id]["mentions_given"][mentioned_id] = {
@@ -179,7 +188,7 @@ for user_id in user_cache:
     )
 
     conn.cursor().execute(
-        "INSERT OR REPLACE INTO users (user_id, user_name, user_nickname, user_avatar_url, mentions_received, mentions_given, reactions_received, reactions_given, messages_sent, attachments_sent, attachments_size, most_frequent_time, most_mentioned_given_name, most_mentioned_received_name, most_mentioned_given_id, most_mentioned_received_id, most_mentioned_given_count, most_mentioned_received_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT OR REPLACE INTO users (user_id, user_name, user_nickname, user_avatar_url, mentions_received, mentions_given, reactions_received, reactions_given, messages_sent, attachments_sent, attachments_size, most_frequent_time, most_mentioned_given_name, most_mentioned_received_name, most_mentioned_given_id, most_mentioned_received_id, most_mentioned_given_count, most_mentioned_received_count, year) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         (
             user_id,
             user_name,
@@ -199,6 +208,7 @@ for user_id in user_cache:
             most_mentioned_received_id,
             most_mentioned_given_count,
             most_mentioned_received_count,
+            CURRENT_YEAR,
         ),
     )
 

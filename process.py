@@ -11,6 +11,9 @@ file_count = len(json_files)
 conn = sqlite3.connect("backend/wrapped.db")
 
 DOWNLOAD_ATTACHMENTS = bool(os.environ.get("DOWNLOAD_ATTACHMENTS"))
+CURRENT_YEAR = int(os.environ.get("CURRENT_YEAR", "2025"))
+
+print("Current year:", CURRENT_YEAR)
 
 for i, file_name in enumerate(json_files):
     print(f"Processing file {i + 1}/{file_count} - {file_name}")
@@ -85,10 +88,11 @@ for i, file_name in enumerate(json_files):
                 channel_id,
                 channel_name,
                 len(content),
+                CURRENT_YEAR,
             )
             conn.cursor().execute(
-                f"INSERT OR REPLACE INTO messages (message_id, type, timestamp, content, author_id, author_name, author_nickname, author_discriminator, author_avatar_url, attachments, embeds, stickers, reactions, total_reactions, mentions, channel_id, channel_name, content_length) VALUES "
-                + f"(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                f"INSERT OR REPLACE INTO messages (message_id, type, timestamp, content, author_id, author_name, author_nickname, author_discriminator, author_avatar_url, attachments, embeds, stickers, reactions, total_reactions, mentions, channel_id, channel_name, content_length, year) VALUES "
+                + f"(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 t,
             )
 
@@ -105,13 +109,14 @@ for i, file_name in enumerate(json_files):
                         res = requests.get(attachment["url"])
                         attachment_file.write(res.content)
                 conn.cursor().execute(
-                    f"INSERT OR REPLACE INTO attachments (id, related_message_id, file_name, timestamp, extension) VALUES (?, ?, ?, ?, ?)",
+                    f"INSERT OR REPLACE INTO attachments (id, related_message_id, file_name, timestamp, extension, year) VALUES (?, ?, ?, ?, ?, ?)",
                     (
                         int(attachment["id"]),
                         message_id,
                         attachment["fileName"],
                         formatted_timestamp,
                         pathlib.Path(attachment["fileName"]).suffix,
+                        CURRENT_YEAR,
                     ),
                 )
         conn.commit()
