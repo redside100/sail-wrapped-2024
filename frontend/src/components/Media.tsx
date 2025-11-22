@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import { animated, useSpring, useSprings } from "@react-spring/web";
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import {
   getAttachment,
   getLikes,
@@ -24,6 +24,7 @@ import { useParams } from "react-router-dom";
 import LinkIcon from "@mui/icons-material/Link";
 import { getTruncatedString } from "../util";
 import { LoadingAnimation } from "./LoadingPage";
+import { UserContext } from "../App";
 
 export const MediaContainer = ({
   isVideo,
@@ -136,13 +137,15 @@ const Media = () => {
   const [fetchedInfo, setFetchedInfo] = useState<any>(null);
   const [liked, setLiked] = useState(false);
 
+  const { year } = useContext(UserContext);
+
   useEffect(() => {
     if (!viewAttachmentId) {
       return;
     }
     const fetchMedia = async () => {
       const token = localStorage.getItem("access_token") ?? "";
-      const [res, status] = await getAttachment(token, viewAttachmentId);
+      const [res, status] = await getAttachment(token, viewAttachmentId, year);
       if (status !== 200) {
         toast.error("Failed to get media.");
         return;
@@ -156,7 +159,7 @@ const Media = () => {
   useEffect(() => {
     const fetchLikes = async () => {
       const token = localStorage.getItem("access_token") ?? "";
-      const [res, status] = await getLikes(token);
+      const [res, status] = await getLikes(token, year);
       if (status !== 200) {
         toast.error("Failed to get likes.");
         return;
@@ -202,7 +205,7 @@ const Media = () => {
     const token = localStorage.getItem("access_token") ?? "";
     setMediaInfo(null);
     setIsLoading(true);
-    const [res, status] = await getRandomAttachment(token, videoOnly);
+    const [res, status] = await getRandomAttachment(token, videoOnly, year);
     if (status !== 200) {
       toast.error(`Failed to fetch media. Reason: ${res.detail}`);
       setIsLoading(false);

@@ -26,34 +26,42 @@ import Stats from "./components/Stats";
 import TimeMachine from "./components/TimeMachine";
 import Secret from "./components/Secret";
 
-const DynamicMenuItem = ({ to, text, IconComponent }: { to: string, text: string, IconComponent: any}) => (
+const DynamicMenuItem = ({
+  to,
+  text,
+  IconComponent,
+}: {
+  to: string;
+  text: string;
+  IconComponent: any;
+}) => (
   <Link to={to} style={{ textDecoration: "none" }}>
-  <Button
-    variant="text"
-    sx={{
-      display: {
-        xs: "none",
-        sm: "block",
-      },
-    }}
-  >
-    <Typography noWrap>{text}</Typography>
-  </Button>
-  <IconComponent
-    sx={{
-      color: "white",
-      display: {
-        xs: "block",
-        sm: "none",
-      },
-      p: 0.5,
-    }}
-  />
-</Link>
-)
+    <Button
+      variant="text"
+      sx={{
+        display: {
+          xs: "none",
+          sm: "block",
+        },
+      }}
+    >
+      <Typography noWrap>{text}</Typography>
+    </Button>
+    <IconComponent
+      sx={{
+        color: "white",
+        display: {
+          xs: "block",
+          sm: "none",
+        },
+        p: 0.5,
+      }}
+    />
+  </Link>
+);
 
 const MainView = () => {
-  const { user, setUser } = useContext(UserContext);
+  const { user, setUser, year } = useContext(UserContext);
   const doLogout = async () => {
     const token = localStorage.getItem("access_token") ?? "";
     localStorage.clear();
@@ -115,15 +123,39 @@ const MainView = () => {
                   mr: 1,
                 }}
               >
-                Sail Wrapped 2024
+                Sail Wrapped {year}
               </Typography>
               <DynamicMenuItem to="/" text="Home" IconComponent={HomeIcon} />
-              <DynamicMenuItem to="/media" text="Media" IconComponent={PermMedia} />
-              <DynamicMenuItem to="/messages" text="Messages" IconComponent={Message} />
-              <DynamicMenuItem to="/likes" text="Likes" IconComponent={Favorite} />
-              <DynamicMenuItem to="/leaderboard" text="Leaderboard" IconComponent={LeaderboardIcon} />
-              <DynamicMenuItem to="/time-machine" text="Time Machine" IconComponent={AccessTime} />
-              <DynamicMenuItem to="/stats" text="Stats" IconComponent={Insights} />
+              <DynamicMenuItem
+                to="/media"
+                text="Media"
+                IconComponent={PermMedia}
+              />
+              <DynamicMenuItem
+                to="/messages"
+                text="Messages"
+                IconComponent={Message}
+              />
+              <DynamicMenuItem
+                to="/likes"
+                text="Likes"
+                IconComponent={Favorite}
+              />
+              <DynamicMenuItem
+                to="/leaderboard"
+                text="Leaderboard"
+                IconComponent={LeaderboardIcon}
+              />
+              <DynamicMenuItem
+                to="/time-machine"
+                text="Time Machine"
+                IconComponent={AccessTime}
+              />
+              <DynamicMenuItem
+                to="/stats"
+                text="Stats"
+                IconComponent={Insights}
+              />
             </Box>
             <Box alignItems="center" display="flex" gap={2}>
               <Box

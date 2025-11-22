@@ -1,6 +1,6 @@
 import { Box, Button, Typography } from "@mui/material";
 import { animated, useSpring } from "@react-spring/web";
-import { AUTH_URL } from "../consts";
+import { AUTH_URL, COLORS, CURRENT_YEAR } from "../consts";
 
 const LandingPage = () => {
   const logoStyle = useSpring({
@@ -86,8 +86,8 @@ const LandingPage = () => {
             </Typography>
           </animated.div>
           <animated.div style={yearStyle}>
-            <Typography variant="h3" color="white">
-              <strong>2024</strong>
+            <Typography variant="h3" color={COLORS.LINK}>
+              <strong>{CURRENT_YEAR}!</strong>
             </Typography>
           </animated.div>
         </Box>

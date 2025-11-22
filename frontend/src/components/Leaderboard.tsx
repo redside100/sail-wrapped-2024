@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { getLeaderboard } from "../api";
 import toast from "react-hot-toast";
 import { animated, useSprings } from "@react-spring/web";
@@ -7,6 +7,7 @@ import { Leaderboard as LeaderboardIcon } from "@mui/icons-material";
 import { usePagination } from "../util";
 import GenericEntry from "./GenericEntry";
 import { LoadingAnimation } from "./LoadingPage";
+import { UserContext } from "../App";
 
 const MAX_PER_PAGE = 5;
 
@@ -54,11 +55,13 @@ const Leaderboard = () => {
     [page, tab]
   );
 
+  const { year } = useContext(UserContext);
+
   // fetch leaderboard on load
   useEffect(() => {
     const fetchLeaderboard = async () => {
       const token = localStorage.getItem("access_token") ?? "";
-      const [res, status] = await getLeaderboard(token);
+      const [res, status] = await getLeaderboard(token, year);
       if (status !== 200) {
         toast.error("Failed to get leaderboard.");
         return;
@@ -78,7 +81,7 @@ const Leaderboard = () => {
         </Box>
       </animated.div>
       <animated.div style={headerStyle[1]}>
-        <Typography>Notable liked media and messages</Typography>
+        <Typography>Notable liked media and messages during {year}</Typography>
       </animated.div>
       {loading && (
         <Box mt={3}>

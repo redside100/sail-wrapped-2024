@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { getLikes } from "../api";
 import toast from "react-hot-toast";
 import { animated, useSprings } from "@react-spring/web";
@@ -7,6 +7,7 @@ import { Favorite } from "@mui/icons-material";
 import { usePagination } from "../util";
 import GenericEntry from "./GenericEntry";
 import { LoadingAnimation } from "./LoadingPage";
+import { UserContext } from "../App";
 
 const MAX_PER_PAGE = 5;
 
@@ -51,13 +52,14 @@ const Likes = () => {
     }),
     [page, tab]
   );
+  const { year } = useContext(UserContext);
 
   // fetch user likes on load
   useEffect(() => {
     const fetchLikes = async () => {
       const token = localStorage.getItem("access_token") ?? "";
       setLoading(true);
-      const [res, status] = await getLikes(token);
+      const [res, status] = await getLikes(token, year);
       if (status !== 200) {
         toast.error("Failed to get likes.");
         return;
@@ -77,7 +79,7 @@ const Likes = () => {
         </Box>
       </animated.div>
       <animated.div style={headerStyle[1]}>
-        <Typography>Your liked media and messages</Typography>
+        <Typography>Your liked media and messages for {year}</Typography>
       </animated.div>
       {loading && (
         <Box mt={3}>

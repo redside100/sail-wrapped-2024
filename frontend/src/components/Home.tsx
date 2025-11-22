@@ -1,6 +1,9 @@
 import { Box, Grid2, Link, Stack, Typography } from "@mui/material";
 import { animated, useSpring, useSprings } from "@react-spring/web";
 import HomeButton from "./HomeButton";
+import { useContext } from "react";
+import { UserContext } from "../App";
+import YearSelector from "./YearSelector";
 
 const Home = () => {
   const sailStyle = useSpring({
@@ -25,6 +28,7 @@ const Home = () => {
     },
     delay: 200 + 100 * idx,
   }));
+  const { year } = useContext(UserContext);
   return (
     <Stack justifyContent="center" alignItems="center" p={3}>
       <Box
@@ -42,12 +46,15 @@ const Home = () => {
             style={{ borderRadius: 100 }}
           />
         </animated.div>
-        <Typography variant="h3">Sail Wrapped 2024</Typography>
+        <Box display="flex" alignItems="center" flexWrap="wrap">
+          <Typography variant="h3">Sail Wrapped</Typography>
+          <YearSelector />
+        </Box>
         <Typography mt={2}>
-          A collection of the various things we've sent throughout 2024.
+          A collection of the various things we've sent throughout {year}.
         </Typography>
         <Typography>
-          You can view last year's Sail Wrapped{" "}
+          You can view the 2016 - 2023 Sail Wrapped{" "}
           <Link
             color="#90caf9"
             href="https://sw2023.redside.moe/"

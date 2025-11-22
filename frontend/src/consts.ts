@@ -95,7 +95,7 @@ export const PUSHEEN_PARTICLE_OPTIONS = {
           },
           {
             src: "/pusheen_burger.png",
-          }
+          },
         ],
       },
     },
@@ -180,3 +180,8 @@ export const VIDEO_EXT_LIST = [
 ];
 
 export const SAIL_MSG_URL = "discord://discord.com/channels/169611319501258753";
+export const CURRENT_YEAR = 2025;
+export const EASTER_DATE_OFFSET: Record<number, number> = {
+  2024: 90,
+  2025: 109,
+};

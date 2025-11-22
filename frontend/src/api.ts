@@ -45,10 +45,11 @@ export const getInfo = async (token: string) => {
 
 export const getRandomAttachment = async (
   token: string,
-  videoOnly: boolean
+  videoOnly: boolean,
+  year: number
 ) => {
   const res = await fetch(
-    `${API_BASE}/attachment/random?video_only=${videoOnly}`,
+    `${API_BASE}/attachment/random?year=${year}&video_only=${videoOnly}`,
     {
       method: "GET",
       headers: {
@@ -60,20 +61,31 @@ export const getRandomAttachment = async (
   return [await res.json(), res.status];
 };
 
-export const getAttachment = async (token: string, attachmentId: string) => {
-  const res = await fetch(`${API_BASE}/attachment/view/${attachmentId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      token,
-    },
-  });
+export const getAttachment = async (
+  token: string,
+  attachmentId: string,
+  year: number
+) => {
+  const res = await fetch(
+    `${API_BASE}/attachment/view/${attachmentId}?year=${year}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        token,
+      },
+    }
+  );
   return [await res.json(), res.status];
 };
 
-export const getRandomMessage = async (token: string, minLength: number) => {
+export const getRandomMessage = async (
+  token: string,
+  minLength: number,
+  year: number
+) => {
   const res = await fetch(
-    `${API_BASE}/message/random?min_length=${minLength}`,
+    `${API_BASE}/message/random?year=${year}&min_length=${minLength}`,
     {
       method: "GET",
       headers: {
@@ -96,8 +108,8 @@ export const getMessage = async (token: string, messageId: string) => {
   return [await res.json(), res.status];
 };
 
-export const getLikes = async (token: string) => {
-  const res = await fetch(`${API_BASE}/likes`, {
+export const getLikes = async (token: string, year: number) => {
+  const res = await fetch(`${API_BASE}/likes?year=${year}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -139,8 +151,8 @@ export const sendUnlike = async (
   return [await res.json(), res.status];
 };
 
-export const getLeaderboard = async (token: string) => {
-  const res = await fetch(`${API_BASE}/leaderboard`, {
+export const getLeaderboard = async (token: string, year: number) => {
+  const res = await fetch(`${API_BASE}/leaderboard?year=${year}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -150,8 +162,8 @@ export const getLeaderboard = async (token: string) => {
   return [await res.json(), res.status];
 };
 
-export const getStats = async (token: string) => {
-  const res = await fetch(`${API_BASE}/stats`, {
+export const getStats = async (token: string, year: number) => {
+  const res = await fetch(`${API_BASE}/stats?year=${year}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -161,8 +173,12 @@ export const getStats = async (token: string) => {
   return [await res.json(), res.status];
 };
 
-export const getTimeMachineSnapshot = async (token: string, date: string) => {
-  const res = await fetch(`${API_BASE}/time_machine/${date}`, {
+export const getTimeMachineSnapshot = async (
+  token: string,
+  date: string,
+  year: number
+) => {
+  const res = await fetch(`${API_BASE}/time_machine/${date}?year=${year}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

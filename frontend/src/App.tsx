@@ -6,7 +6,12 @@ import { getInfo, login, refresh } from "./api";
 import moment from "moment";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
-import { COLORS, PARTICLE_OPTIONS, PUSHEEN_PARTICLE_OPTIONS } from "./consts";
+import {
+  COLORS,
+  CURRENT_YEAR,
+  PARTICLE_OPTIONS,
+  PUSHEEN_PARTICLE_OPTIONS,
+} from "./consts";
 import { loadImageShape } from "@tsparticles/shape-image";
 
 export const UserContext = createContext<any>({
@@ -18,14 +23,22 @@ export const UserContext = createContext<any>({
   setUser: () => {},
   pusheenMode: false,
   setPusheenMode: () => {},
+  year: CURRENT_YEAR,
+  setYear: () => {},
 });
 
 function App() {
   const [user, setUser] = useState<any>({});
   const [pusheenMode, setPusheenMode] = useState(false);
+  const [year, setYear] = useState(CURRENT_YEAR);
 
   useEffect(() => {
     setPusheenMode(localStorage.getItem("pusheen_mode") === "true");
+    setYear(
+      localStorage.getItem("year")
+        ? Number(localStorage.getItem("year"))
+        : CURRENT_YEAR
+    );
   }, []);
 
   const theme = createTheme({
@@ -152,7 +165,9 @@ function App() {
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, setUser, pusheenMode, setPusheenMode }}>
+    <UserContext.Provider
+      value={{ user, setUser, pusheenMode, setPusheenMode, year, setYear }}
+    >
       <ThemeProvider theme={theme}>
         <Toaster
           toastOptions={{
@@ -162,7 +177,10 @@ function App() {
           }}
         />
         {initParticles && (
-          <Particles id="particles" options={pusheenMode ? PUSHEEN_PARTICLE_OPTIONS : PARTICLE_OPTIONS} />
+          <Particles
+            id="particles"
+            options={pusheenMode ? PUSHEEN_PARTICLE_OPTIONS : PARTICLE_OPTIONS}
+          />
         )}
         <Box zIndex={1} position="relative">
           <MainView />

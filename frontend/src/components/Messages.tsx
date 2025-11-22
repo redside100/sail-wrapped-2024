@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import { animated, useSpring, useSprings } from "@react-spring/web";
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import {
   getLikes,
   getMessage,
@@ -26,6 +26,7 @@ import { COLORS, SAIL_MSG_URL } from "../consts";
 import remarkGfm from "remark-gfm";
 import { getTruncatedString } from "../util";
 import { LoadingAnimation } from "./LoadingPage";
+import { UserContext } from "../App";
 
 export const MessageContainer = ({
   messageInfo,
@@ -129,11 +130,13 @@ const Messages = () => {
     fetchMessage();
   }, []);
 
+  const { year } = useContext(UserContext);
+
   // fetch/sync user message likes on load
   useEffect(() => {
     const fetchLikes = async () => {
       const token = localStorage.getItem("access_token") ?? "";
-      const [res, status] = await getLikes(token);
+      const [res, status] = await getLikes(token, year);
       if (status !== 200) {
         toast.error("Failed to get likes.");
         return;
@@ -160,7 +163,7 @@ const Messages = () => {
     const token = localStorage.getItem("access_token") ?? "";
     setMessageInfo(null);
     setIsLoading(true);
-    const [res, status] = await getRandomMessage(token, minLength ?? 8);
+    const [res, status] = await getRandomMessage(token, minLength ?? 8, year);
     if (status !== 200) {
       toast.error(`Failed to fetch message. Reason: ${res.detail}`);
       setIsLoading(false);

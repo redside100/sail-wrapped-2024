@@ -66,7 +66,7 @@ const Stats = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [missingInfo, setMissingInfo] = useState(false);
   const [stats, setStats] = useState<any>(null);
-  const { user } = useContext(UserContext);
+  const { user, year } = useContext(UserContext);
   const [style] = useSprings(2, (idx: number) => ({
     from: {
       opacity: 0,
@@ -94,7 +94,7 @@ const Stats = () => {
   useEffect(() => {
     const fetchStats = async () => {
       const token = localStorage.getItem("access_token") ?? "";
-      const [res, status] = await getStats(token);
+      const [res, status] = await getStats(token, year);
       if (status === 404) {
         setMissingInfo(true);
         setIsLoading(false);
@@ -120,8 +120,8 @@ const Stats = () => {
       <animated.div style={style[1]}>
         <Typography>
           Statistics about{" "}
-          <Link color={COLORS.LINK}>@{user.info.username}</Link> on Sail during
-          2024
+          <Link color={COLORS.LINK}>@{user.info.username}</Link> on Sail during{" "}
+          {year}
         </Typography>
       </animated.div>
       {isLoading && (

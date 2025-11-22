@@ -15,7 +15,12 @@ import { AccessTime, Egg, OpenInNew } from "@mui/icons-material";
 import moment from "moment";
 import { LoadingAnimation } from "./LoadingPage";
 import { MessageContainer } from "./Messages";
-import { COLORS, SAIL_MSG_URL, VIDEO_EXT_LIST } from "../consts";
+import {
+  COLORS,
+  EASTER_DATE_OFFSET,
+  SAIL_MSG_URL,
+  VIDEO_EXT_LIST,
+} from "../consts";
 import { MediaContainer } from "./Media";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../App";
@@ -92,7 +97,7 @@ const TimeMachine = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [dateOffset, setDateOffset] = useState(0);
   const navigate = useNavigate();
-  const { user } = useContext(UserContext);
+  const { user, year } = useContext(UserContext);
 
   const [fadeStyle] = useSpring(
     {
@@ -137,7 +142,7 @@ const TimeMachine = () => {
     const token = localStorage.getItem("access_token") ?? "";
     setSnapshotInfo(null);
     setIsLoading(true);
-    const [res, status] = await getTimeMachineSnapshot(token, date);
+    const [res, status] = await getTimeMachineSnapshot(token, date, year);
     if (status !== 200) {
       toast.error(`Failed to fetch snapshot. Reason: ${res.detail}`);
       setIsLoading(false);
@@ -149,7 +154,7 @@ const TimeMachine = () => {
 
   const getDate = (value: number) => {
     return moment()
-      .year(2024)
+      .year(year)
       .startOf("year")
       .add(moment.duration(value, "day"))
       .format("YYYY-MM-DD");
@@ -158,7 +163,7 @@ const TimeMachine = () => {
   const displayDate = useMemo(
     () =>
       moment()
-        .year(2024)
+        .year(year)
         .startOf("year")
         .add(moment.duration(dateOffset, "day"))
         .format("MMM DD, YYYY"),
@@ -192,7 +197,7 @@ const TimeMachine = () => {
         </Box>
       </animated.div>
       <animated.div style={style[1]}>
-        <Typography>See random snapshots of a date in 2024</Typography>
+        <Typography>See random snapshots of a date in {year}</Typography>
       </animated.div>
       <animated.div style={style[2]}>
         <Box
@@ -256,12 +261,14 @@ const TimeMachine = () => {
                     key={`snapshot-message-${idx}`}
                   >
                     <animated.div style={snapshotStyle[idx]}>
-                      <Stack sx={{
-                        maxWidth: {
-                          xs: "95vw",
-                          md: "100%"
-                        }
-                      }}>
+                      <Stack
+                        sx={{
+                          maxWidth: {
+                            xs: "95vw",
+                            md: "100%",
+                          },
+                        }}
+                      >
                         <MessageContainer
                           messageInfo={message}
                           maxWidth="100%"
@@ -332,7 +339,9 @@ const TimeMachine = () => {
                               url={attachment.url}
                               defaultVolume={0}
                               maxWidth="100%"
-                              isSpoiler={attachment.file_name.startsWith("SPOILER_")}
+                              isSpoiler={attachment.file_name.startsWith(
+                                "SPOILER_"
+                              )}
                             />
                             <animated.div style={fadeStyle}>
                               <Box display="flex" gap={1} alignItems="center">
@@ -393,7 +402,7 @@ const TimeMachine = () => {
           )}
         </>
       )}
-      {dateOffset === 90 && (
+      {dateOffset === EASTER_DATE_OFFSET[year] && (
         <Box display="flex" width="100%" justifyContent="flex-end" mt={3}>
           <Egg
             sx={{
