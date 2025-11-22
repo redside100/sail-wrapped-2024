@@ -2,14 +2,7 @@ import { useContext, useEffect, useMemo, useState } from "react";
 import { getMentionGraphData } from "../api";
 import toast from "react-hot-toast";
 import { animated, useSprings } from "@react-spring/web";
-import {
-  Box,
-  Button,
-  MenuItem,
-  Select,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Box, MenuItem, Select, Stack, Typography } from "@mui/material";
 import { Hub } from "@mui/icons-material";
 import { LoadingAnimation } from "./LoadingPage";
 import { UserContext } from "../App";
