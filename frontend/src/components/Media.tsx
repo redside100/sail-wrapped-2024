@@ -20,7 +20,7 @@ import toast from "react-hot-toast";
 import { COLORS, SAIL_MSG_URL, VIDEO_EXT_LIST } from "../consts";
 import { Favorite, FavoriteBorder, PermMedia } from "@mui/icons-material";
 import moment from "moment";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import LinkIcon from "@mui/icons-material/Link";
 import { getTruncatedString } from "../util";
 import { LoadingAnimation } from "./LoadingPage";
@@ -117,6 +117,8 @@ export const MediaContainer = ({
 
 const Media = () => {
   const { viewAttachmentId } = useParams();
+  const [searchParams] = useSearchParams();
+
   const [videoOnly, setVideoOnly] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [likeAdjustment, setLikeAdjustment] = useState(0);
@@ -143,9 +145,16 @@ const Media = () => {
     if (!viewAttachmentId) {
       return;
     }
+    const requestedYear = searchParams.get("year")
+      ? Number(searchParams.get("year"))
+      : year;
     const fetchMedia = async () => {
       const token = localStorage.getItem("access_token") ?? "";
-      const [res, status] = await getAttachment(token, viewAttachmentId, year);
+      const [res, status] = await getAttachment(
+        token,
+        viewAttachmentId,
+        requestedYear
+      );
       if (status !== 200) {
         toast.error("Failed to get media.");
         return;
@@ -333,7 +342,7 @@ const Media = () => {
                     }}
                     onClick={() => {
                       navigator.clipboard.writeText(
-                        `${window.location.origin}/media/view/${mediaInfo.attachment_id}`
+                        `${window.location.origin}/media/view/${mediaInfo.attachment_id}?year=${year}`
                       );
                       toast.success("Copied permalink to clipboard");
                     }}

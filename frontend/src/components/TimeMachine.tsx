@@ -372,7 +372,7 @@ const TimeMachine = () => {
                                   onClick={() =>
                                     window
                                       .open(
-                                        `${window.location.origin}/media/view/${attachment.attachment_id}`,
+                                        `${window.location.origin}/media/view/${attachment.attachment_id}?year=${year}`,
                                         "_blank"
                                       )
                                       ?.focus()
