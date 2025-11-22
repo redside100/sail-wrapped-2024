@@ -9,6 +9,7 @@ class UserInfo(BaseModel):
     global_name: str
     avatar: Optional[str] = "https://cdn.discordapp.com/embed/avatars/0.png"
 
+
 class SailInfo(BaseModel):
     user_info: UserInfo
     likes: List[str]
@@ -102,3 +103,15 @@ class UserStats(BaseModel):
 class TimeMachineScreenshot(BaseModel):
     messages: List[MessageInfo]
     attachments: List[AttachmentInfo]
+
+
+class MentionGraphEdge(BaseModel):
+    from_user: str
+    from_user_avatar_url: str
+    to_user: str
+    to_user_avatar_url: str
+    count: int
+
+
+class MentionGraphResponse(BaseModel):
+    edges: List[MentionGraphEdge]

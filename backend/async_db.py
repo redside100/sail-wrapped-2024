@@ -2,10 +2,12 @@ from datetime import datetime, timezone
 import time
 from typing import Dict, List, Optional
 import aiosqlite
-from consts import ATTACHMENT_URL_BASE, VIDEO_EXT_LIST
+from consts import ATTACHMENT_URL_BASE, AVATAR_URL_BASE, VIDEO_EXT_LIST
 from models import (
     AttachmentInfo,
     AttachmentSummary,
+    MentionGraphEdge,
+    MentionGraphResponse,
     MessageInfo,
     MessageSummary,
     TimeMachineScreenshot,
@@ -48,7 +50,7 @@ async def get_random_attachment(year: int, video_only: bool = False) -> Attachme
     return AttachmentInfo(
         attachment_id=str(attachment_id),
         file_name=row[1],
-        url=ATTACHMENT_URL_BASE.format(attachment_id, row[1]),
+        url=ATTACHMENT_URL_BASE.format(year, attachment_id, row[1]),
         sender_id=str(row[2]),
         sender_handle=row[3],
         likes=likes,
@@ -107,10 +109,10 @@ async def get_message(message_id: int) -> MessageInfo:
     )
 
 
-async def get_attachment(attachment_id: int) -> Optional[AttachmentInfo]:
+async def get_attachment(year: int, attachment_id: int) -> Optional[AttachmentInfo]:
     async with conn.execute(
-        "SELECT id, file_name, author_id AS sender_id, author_name AS sender_handle, attachments.timestamp, related_message_id, channel_id, channel_name, content FROM attachments LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE id = ?",
-        (attachment_id,),
+        "SELECT id, file_name, author_id AS sender_id, author_name AS sender_handle, attachments.timestamp, related_message_id, channel_id, channel_name, content FROM attachments LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE id = ? AND attachments.year = ?",
+        (attachment_id, year),
     ) as cursor:
         row = await cursor.fetchone()
 
@@ -121,7 +123,7 @@ async def get_attachment(attachment_id: int) -> Optional[AttachmentInfo]:
     return AttachmentInfo(
         attachment_id=str(row[0]),
         file_name=row[1],
-        url=ATTACHMENT_URL_BASE.format(attachment_id, row[1]),
+        url=ATTACHMENT_URL_BASE.format(year, attachment_id, row[1]),
         sender_id=str(row[2]),
         sender_handle=row[3],
         likes=likes,
@@ -133,14 +135,16 @@ async def get_attachment(attachment_id: int) -> Optional[AttachmentInfo]:
     )
 
 
-async def get_likes_for_user(discord_id: str) -> Dict[str, List[str]]:
+async def get_likes_for_user(year: int, discord_id: str) -> Dict[str, List[str]]:
     async with conn.execute(
-        f"SELECT attachment_id, file_name, messages.author_name, messages.content, messages.channel_name FROM likes LEFT JOIN attachments ON likes.attachment_id = attachments.id LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE discord_id = {int(discord_id)} ORDER BY likes.timestamp DESC"
+        f"SELECT attachment_id, file_name, messages.author_name, messages.content, messages.channel_name FROM likes LEFT JOIN attachments ON likes.attachment_id = attachments.id LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE discord_id = {int(discord_id)} AND attachments.year = ? ORDER BY likes.timestamp DESC",
+        (year,),
     ) as cursor:
         attachment_rows = await cursor.fetchall()
 
     async with conn.execute(
-        f"SELECT messages.message_id, messages.content, messages.author_name, messages.channel_name FROM message_likes LEFT JOIN messages ON message_likes.message_id = messages.message_id WHERE discord_id = {int(discord_id)} ORDER BY message_likes.timestamp DESC"
+        f"SELECT messages.message_id, messages.content, messages.author_name, messages.channel_name FROM message_likes LEFT JOIN messages ON message_likes.message_id = messages.message_id WHERE discord_id = {int(discord_id)} AND messages.year = ? ORDER BY message_likes.timestamp DESC",
+        (year,),
     ) as cursor:
         message_rows = await cursor.fetchall()
     return {
@@ -148,7 +152,7 @@ async def get_likes_for_user(discord_id: str) -> Dict[str, List[str]]:
             AttachmentSummary(
                 attachment_id=str(row[0]),
                 file_name=row[1],
-                url=ATTACHMENT_URL_BASE.format(row[0], row[1]),
+                url=ATTACHMENT_URL_BASE.format(year, row[0], row[1]),
                 sender_handle=row[2],
                 related_message_content=row[3],
                 related_channel_name=row[4],
@@ -205,7 +209,7 @@ async def unlike(entity_id: int, discord_id: int, is_attachment: bool):
 
 
 @AsyncTTL(time_to_live=60, maxsize=None)
-async def get_leaderboard():
+async def get_leaderboard(year: int):
     attachment_query = """
 SELECT
     ROW_NUMBER() OVER (
@@ -229,7 +233,7 @@ FROM
             attachment_id
     ) al
     LEFT JOIN attachments ON attachments.id = al.attachment_id
-    LEFT JOIN messages ON attachments.related_message_id = messages.message_id;
+    LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE attachments.year = ?;
 """
 
     message_query = """
@@ -253,10 +257,10 @@ FROM
         GROUP BY
             message_id
     ) ml
-    LEFT JOIN messages ON messages.message_id = ml.message_id
+    LEFT JOIN messages ON messages.message_id = ml.message_id WHERE messages.year = ?;
 """
 
-    async with conn.execute(attachment_query) as cursor:
+    async with conn.execute(attachment_query, (year,)) as cursor:
         attachment_rows = await cursor.fetchall()
 
     if not attachment_rows:
@@ -264,7 +268,7 @@ FROM
 
     attachment_rows.sort(key=lambda row: row[0])
 
-    async with conn.execute(message_query) as cursor:
+    async with conn.execute(message_query, (year,)) as cursor:
         message_rows = await cursor.fetchall()
 
     if not message_rows:
@@ -277,7 +281,7 @@ FROM
             AttachmentSummary(
                 attachment_id=str(row[1]),
                 file_name=row[2],
-                url=ATTACHMENT_URL_BASE.format(row[1], row[2]),
+                url=ATTACHMENT_URL_BASE.format(year, row[1], row[2]),
                 sender_handle=row[3],
                 related_message_content=row[4],
                 related_channel_name=row[5],
@@ -396,3 +400,24 @@ async def get_time_machine_screenshot(date: datetime, year: int):
         ]
 
     return TimeMachineScreenshot(attachments=attachments, messages=messages)
+
+
+async def get_mention_graph(year: int):
+    async with conn.execute(
+        "SELECT user_name, most_mentioned_given_name, most_mentioned_given_count FROM users WHERE year = ? AND most_mentioned_given_count > 0",
+        (year,),
+    ) as cursor:
+        rows = cursor.fetchall()
+        edges = []
+        for row in rows:
+            username, mentioned_name, count = row
+            edge = MentionGraphEdge(
+                from_user=username,
+                from_user_avatar_url=AVATAR_URL_BASE.format(year, username),
+                to_user=mentioned_name,
+                to_user_avatar_url=AVATAR_URL_BASE.format(year, mentioned_name),
+                count=count,
+            )
+            edges.append(edge)
+
+    return MentionGraphResponse(edges=edges)

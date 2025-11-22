@@ -148,10 +148,11 @@ async def get_random_attachment(
 async def get_attachment(
     attachment_id: Annotated[int, Path(title="The Attachment ID to retrieve")],
     token: Annotated[str | None, Header()] = None,
+    year: int = CURRENT_YEAR,
 ):
 
     check_token(token_cache, token)
-    attachment = await async_db.get_attachment(attachment_id)
+    attachment = await async_db.get_attachment(year, attachment_id)
     if not attachment:
         raise HTTPException(status_code=404, detail="Attachment not found")
     return attachment
@@ -190,9 +191,11 @@ async def get_message(
 
 
 @app.get("/likes")
-async def get_user_likes(token: Annotated[str | None, Header()] = None):
+async def get_user_likes(
+    token: Annotated[str | None, Header()] = None, year: int = CURRENT_YEAR
+):
     check_token(token_cache, token)
-    return await async_db.get_likes_for_user(token_cache[token])
+    return await async_db.get_likes_for_user(year, token_cache[token])
 
 
 @app.post("/like")
@@ -216,9 +219,11 @@ async def like(
 
 
 @app.get("/leaderboard")
-async def leaderboard(token: Annotated[str | None, Header()] = None):
+async def leaderboard(
+    token: Annotated[str | None, Header()] = None, year: int = CURRENT_YEAR
+):
     check_token(token_cache, token)
-    return await async_db.get_leaderboard()
+    return await async_db.get_leaderboard(year)
 
 
 @app.get("/stats")
@@ -248,3 +253,12 @@ async def time_machine(
 if __name__ == "__main__":
     port = 5556 if os.environ.get("ENV") == "production" else 8000
     uvicorn.run("main:app", host="0.0.0.0", port=port)
+
+
+@app.get("/mentions/graph")
+async def mention_graph(
+    token: Annotated[str | None, Header()] = None,
+    year: int = CURRENT_YEAR,
+):
+    check_token(token_cache, token)
+    return await async_db.get_mention_graph(year)

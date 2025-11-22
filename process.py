@@ -95,7 +95,6 @@ for i, file_name in enumerate(json_files):
                 + f"(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 t,
             )
-
             # attachments
             for attachment in message["attachments"]:
                 if DOWNLOAD_ATTACHMENTS:

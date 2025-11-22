@@ -3,15 +3,18 @@ import orjson
 from datetime import datetime
 import os
 
+import requests
+
 conn = sqlite3.connect("backend/wrapped.db")
 CURRENT_YEAR = int(os.environ.get("CURRENT_YEAR", "2025"))
+DOWNLOAD_AVATARS = bool(os.environ.get("DOWNLOAD_AVATARS"))
 
 print("Current year:", CURRENT_YEAR)
 
 all_messages = (
     conn.cursor()
     .execute(
-        f"SELECT author_id, author_name, author_nickname, author_avatar_url, content, timestamp, attachments, reactions, mentions, total_reactions WHERE year = {CURRENT_YEAR} FROM messages ORDER BY timestamp ASC"
+        f"SELECT author_id, author_name, author_nickname, author_avatar_url, content, timestamp, attachments, reactions, mentions, total_reactions FROM messages WHERE year = {CURRENT_YEAR} ORDER BY timestamp ASC"
     )
     .fetchall()
 )
@@ -211,5 +214,18 @@ for user_id in user_cache:
             CURRENT_YEAR,
         ),
     )
+
+    if DOWNLOAD_AVATARS and user_avatar_url:
+        with open(
+            f"avatars/{user_name}.png",
+            "wb+",
+        ) as avatar_file:
+            try:
+                res = requests.get(user_avatar_url)
+                avatar_file.write(res.content)
+            except:
+                print(f"Failed to download avatar for {user_name}: {user_avatar_url}")
+                continue
+
 
 conn.commit()

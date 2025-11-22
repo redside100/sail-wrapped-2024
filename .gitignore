@@ -165,6 +165,7 @@ cython_debug/
 backend/client_secret
 export/*
 attachments/*
+avatars/*
 plans.md
 frontend/*.tsbuildinfo
 docker_*.sh
