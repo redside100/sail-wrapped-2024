@@ -70,7 +70,7 @@ const Leaderboard = () => {
       setLoading(false);
     };
     fetchLeaderboard();
-  }, []);
+  }, [year]);
 
   return (
     <Stack justifyContent="center" alignItems="center" p={3}>
@@ -93,7 +93,7 @@ const Leaderboard = () => {
           <animated.div style={headerStyle[2]}>
             <Tabs
               value={tab}
-              onChange={(_, value) => setTab(value)}
+              onChange={(_: unknown, value: string) => setTab(value)}
               indicatorColor="secondary"
               sx={{
                 mb: 3,

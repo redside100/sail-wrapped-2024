@@ -16,6 +16,7 @@ import {
   AccessTime,
   Favorite,
   Home as HomeIcon,
+  Hub,
   Insights,
   Leaderboard as LeaderboardIcon,
   Logout,
@@ -25,6 +26,8 @@ import {
 import Stats from "./components/Stats";
 import TimeMachine from "./components/TimeMachine";
 import Secret from "./components/Secret";
+import YearSelector from "./components/YearSelector";
+import MentionGraph from "./components/MentionGraph";
 
 const DynamicMenuItem = ({
   to,
@@ -112,19 +115,19 @@ const MainView = () => {
                   style={{ borderRadius: 10 }}
                 />
               </Box>
-              <Typography
-                variant="h4"
-                noWrap
-                sx={{
-                  display: {
-                    xs: "none",
-                    lg: "block",
-                  },
-                  mr: 1,
+              <Box
+                display={{
+                  xs: "none",
+                  lg: "flex",
                 }}
+                alignItems="center"
+                gap={1}
               >
-                Sail Wrapped {year}
-              </Typography>
+                <Typography variant="h4" noWrap>
+                  Sail Wrapped
+                </Typography>
+                <YearSelector size={31} />
+              </Box>
               <DynamicMenuItem to="/" text="Home" IconComponent={HomeIcon} />
               <DynamicMenuItem
                 to="/media"
@@ -150,6 +153,11 @@ const MainView = () => {
                 to="/time-machine"
                 text="Time Machine"
                 IconComponent={AccessTime}
+              />
+              <DynamicMenuItem
+                to="/mention-graph"
+                text="Mention Graph"
+                IconComponent={Hub}
               />
               <DynamicMenuItem
                 to="/stats"
@@ -228,6 +236,7 @@ const MainView = () => {
         <Route path="/likes" element={<Likes />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/time-machine" element={<TimeMachine />} />
+        <Route path="/mention-graph" element={<MentionGraph />} />
         <Route path="/stats" element={<Stats />} />
         <Route
           path="/super-duper-secret-page-for-cool-people"

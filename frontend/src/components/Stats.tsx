@@ -107,7 +107,7 @@ const Stats = () => {
       setIsLoading(false);
     };
     fetchStats();
-  }, []);
+  }, [year]);
 
   return (
     <Stack justifyContent="center" alignItems="center" p={3}>

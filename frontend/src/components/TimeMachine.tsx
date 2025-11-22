@@ -220,7 +220,7 @@ const TimeMachine = () => {
             min={0}
             max={365}
             color="secondary"
-            onChangeCommitted={(_, value: number | number[]) => {
+            onChangeCommitted={(_: unknown, value: number | number[]) => {
               if (Array.isArray(value)) {
                 return;
               }

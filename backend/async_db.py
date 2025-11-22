@@ -406,13 +406,13 @@ async def get_time_machine_screenshot(date: datetime, year: int):
 @AsyncTTL(time_to_live=3600, maxsize=None)
 async def get_mention_graph(year: int):
     async with conn.execute(
-        "SELECT user_name, most_mentioned_given_name, most_mentioned_given_count FROM users WHERE year = ? AND most_mentioned_given_count > 0",
+        "SELECT user_name, most_mentioned_given_name FROM users WHERE year = ? AND most_mentioned_given_count > 0",
         (year,),
     ) as cursor:
-        rows = cursor.fetchall()
+        rows = await cursor.fetchall()
         edges = []
         for row in rows:
-            username, mentioned_name, count = row
+            username, mentioned_name = row
             edge = MentionGraphEdge(
                 from_user=username,
                 from_user_avatar_url=(
@@ -426,7 +426,6 @@ async def get_mention_graph(year: int):
                     if year >= 2025
                     else get_default_discord_avatar_url(mentioned_name)
                 ),
-                count=count,
             )
             edges.append(edge)
 

@@ -110,7 +110,6 @@ class MentionGraphEdge(BaseModel):
     from_user_avatar_url: str
     to_user: str
     to_user_avatar_url: str
-    count: int
 
 
 class MentionGraphResponse(BaseModel):

@@ -187,3 +187,14 @@ export const getTimeMachineSnapshot = async (
   });
   return [await res.json(), res.status];
 };
+
+export const getMentionGraphData = async (token: string, year: number) => {
+  const res = await fetch(`${API_BASE}/mentions/graph?year=${year}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      token,
+    },
+  });
+  return [await res.json(), res.status];
+};

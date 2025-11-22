@@ -51,6 +51,6 @@ VIDEO_EXT_LIST = [
 ATTACHMENT_URL_BASE = (
     "https://redside.tor1.digitaloceanspaces.com/sw/{}/attachments/{}_{}"
 )
-AVATAR_URL_BASE = "https://redside.tor1.digitaloceanspaces.com/sw/{}/avatars/{}_{}"
+AVATAR_URL_BASE = "https://redside.tor1.digitaloceanspaces.com/sw/{}/avatars/{}.png"
 with open("client_secret", "r") as f:
     CLIENT_SECRET = f.read()

@@ -153,7 +153,7 @@ const Media = () => {
       setMediaInfo(res);
     };
     fetchMedia();
-  }, []);
+  }, [year]);
 
   // fetch/sync user attachment likes on load
   useEffect(() => {

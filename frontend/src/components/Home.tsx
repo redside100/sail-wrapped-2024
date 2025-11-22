@@ -46,9 +46,9 @@ const Home = () => {
             style={{ borderRadius: 100 }}
           />
         </animated.div>
-        <Box display="flex" alignItems="center" flexWrap="wrap">
+        <Box display="flex" alignItems="center" flexWrap="wrap" gap={1.5}>
           <Typography variant="h3">Sail Wrapped</Typography>
-          <YearSelector />
+          <YearSelector size={40} mt={0.75} />
         </Box>
         <Typography mt={2}>
           A collection of the various things we've sent throughout {year}.

@@ -9,13 +9,15 @@ const availableYears = Array.from(
   (_, i) => CURRENT_YEAR - i
 );
 
-const YearSelector = () => {
+const YearSelector = ({ size, mt }: { size: number; mt?: number }) => {
   const { year, setYear } = useContext(UserContext);
   return (
     <Select
       value={year}
       onChange={(e) => {
-        setYear(Number((e.target as HTMLInputElement).value));
+        const value = Number((e.target as HTMLInputElement).value);
+        setYear(value);
+        localStorage.setItem("year", e.target.value);
       }}
       MenuProps={{
         PaperProps: {
@@ -26,7 +28,7 @@ const YearSelector = () => {
       }}
       sx={{
         color: "white",
-        fontSize: 40,
+        fontSize: size,
         fontWeight: "bold",
         "& .MuiSvgIcon-root": {
           color: "white",
@@ -34,11 +36,16 @@ const YearSelector = () => {
         "& .MuiOutlinedInput-notchedOutline": {
           border: "none",
         },
-        mt: 0.5,
+        "& .MuiSelect-select": {
+          p: 0,
+        },
+        mt,
       }}
     >
       {availableYears.map((yearValue) => (
-        <MenuItem value={yearValue}>{yearValue}</MenuItem>
+        <MenuItem key={yearValue} value={yearValue}>
+          {yearValue}
+        </MenuItem>
       ))}
     </Select>
   );
