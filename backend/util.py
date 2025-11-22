@@ -2,6 +2,7 @@ import aiohttp
 from fastapi import HTTPException
 from consts import CLIENT_ID, CLIENT_SECRET, DISCORD_API_ENDPOINT, REDIRECT_URI
 
+
 async def verify_token(session: aiohttp.ClientSession, token: str):
     guild_ids = {guild["id"] for guild in await get_guilds(session, token)}
     # check if in sail
@@ -21,7 +22,7 @@ async def exchange_code(session: aiohttp.ClientSession, code: str):
         f"{DISCORD_API_ENDPOINT}/oauth2/token",
         data=data,
         headers=headers,
-        auth=aiohttp.BasicAuth(CLIENT_ID, CLIENT_SECRET)
+        auth=aiohttp.BasicAuth(CLIENT_ID, CLIENT_SECRET),
     ) as r:
         r.raise_for_status()
         return await r.json()
@@ -50,7 +51,7 @@ async def revoke_access_token(session: aiohttp.ClientSession, token: str):
         f"{DISCORD_API_ENDPOINT}/oauth2/token/revoke",
         data=data,
         headers=headers,
-        auth=aiohttp.BasicAuth(CLIENT_ID, CLIENT_SECRET)
+        auth=aiohttp.BasicAuth(CLIENT_ID, CLIENT_SECRET),
     )
 
 
@@ -61,12 +62,19 @@ async def refresh_token(session: aiohttp.ClientSession, refresh_token: str):
         f"{DISCORD_API_ENDPOINT}/oauth2/token",
         data=data,
         headers=headers,
-        auth=aiohttp.BasicAuth(CLIENT_ID, CLIENT_SECRET)
+        auth=aiohttp.BasicAuth(CLIENT_ID, CLIENT_SECRET),
     ) as r:
         r.raise_for_status()
         return await r.json()
 
-def check_token(token_cache: dict, token: str):
 
+def check_token(token_cache: dict, token: str):
     if token not in token_cache:
-        raise HTTPException(status_code=401, detail="Token expired or missing. Please login again.")
+        raise HTTPException(
+            status_code=401, detail="Token expired or missing. Please login again."
+        )
+
+
+def get_default_discord_avatar_url(username: str) -> str:
+    default_avatar_num = int.from_bytes(username.encode()) % 5
+    return f"https://cdn.discordapp.com/embed/avatars/{default_avatar_num}.png"

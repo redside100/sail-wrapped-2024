@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 import time
 from typing import Dict, List, Optional
 import aiosqlite
+from util import get_default_discord_avatar_url
 from consts import ATTACHMENT_URL_BASE, AVATAR_URL_BASE, VIDEO_EXT_LIST
 from models import (
     AttachmentInfo,
@@ -358,7 +359,7 @@ async def get_time_machine_screenshot(date: datetime, year: int):
     start_time = int(date.replace(tzinfo=timezone.utc).timestamp())
     end_time = start_time + 86400
     async with conn.execute(
-        "SELECT id, file_name, author_id AS sender_id, author_name AS sender_handle, attachments.timestamp, related_message_id, channel_id, channel_name, content FROM attachments LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE messages.timestamp >= ? AND messages.timestamp <= ? AND year = ? ORDER BY RANDOM() LIMIT ?",
+        "SELECT id, file_name, author_id AS sender_id, author_name AS sender_handle, attachments.timestamp, related_message_id, channel_id, channel_name, content FROM attachments LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE messages.timestamp >= ? AND messages.timestamp <= ? AND attachments.year = ? ORDER BY RANDOM() LIMIT ?",
         (start_time, end_time, year, MAX_ATTACHMENT_COUNT),
     ) as cursor:
         rows = await cursor.fetchall()
@@ -366,7 +367,7 @@ async def get_time_machine_screenshot(date: datetime, year: int):
             AttachmentInfo(
                 attachment_id=str(row[0]),
                 file_name=row[1],
-                url=ATTACHMENT_URL_BASE.format(row[0], row[1]),
+                url=ATTACHMENT_URL_BASE.format(year, row[0], row[1]),
                 sender_id=str(row[2]),
                 sender_handle=row[3],
                 likes=0,
@@ -402,6 +403,7 @@ async def get_time_machine_screenshot(date: datetime, year: int):
     return TimeMachineScreenshot(attachments=attachments, messages=messages)
 
 
+@AsyncTTL(time_to_live=3600, maxsize=None)
 async def get_mention_graph(year: int):
     async with conn.execute(
         "SELECT user_name, most_mentioned_given_name, most_mentioned_given_count FROM users WHERE year = ? AND most_mentioned_given_count > 0",
@@ -413,9 +415,17 @@ async def get_mention_graph(year: int):
             username, mentioned_name, count = row
             edge = MentionGraphEdge(
                 from_user=username,
-                from_user_avatar_url=AVATAR_URL_BASE.format(year, username),
+                from_user_avatar_url=(
+                    AVATAR_URL_BASE.format(year, username)
+                    if year >= 2025
+                    else get_default_discord_avatar_url(username)
+                ),
                 to_user=mentioned_name,
-                to_user_avatar_url=AVATAR_URL_BASE.format(year, mentioned_name),
+                to_user_avatar_url=(
+                    AVATAR_URL_BASE.format(year, mentioned_name)
+                    if year >= 2025
+                    else get_default_discord_avatar_url(mentioned_name)
+                ),
                 count=count,
             )
             edges.append(edge)
