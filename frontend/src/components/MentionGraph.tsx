@@ -75,11 +75,21 @@ const MentionGraph = () => {
 
   const edges = useMemo(() => {
     if (!graphData) return [];
-    return graphData.edges.map((edge: any) => ({
-      source: edge.from_user,
-      target: edge.to_user,
-      id: `${edge.from_user}-${edge.to_user}`,
-    }));
+    return graphData.edges.reduce((acc: any[], edge: any) => {
+      const reverseEdgeIdx = acc.findIndex(
+        (e) => e.id === `${edge.to_user}-${edge.from_user}`
+      );
+      if (reverseEdgeIdx !== -1) {
+        acc[reverseEdgeIdx].label += ` + ${edge.count}`;
+      }
+      acc.push({
+        source: edge.from_user,
+        target: edge.to_user,
+        label: reverseEdgeIdx !== -1 ? undefined : edge.count.toString(),
+        id: `${edge.from_user}-${edge.to_user}`,
+      });
+      return acc;
+    }, []);
   }, [graphData]);
 
   return (
@@ -124,6 +134,8 @@ const MentionGraph = () => {
                 edges={edges}
                 theme={customTheme}
                 cameraMode={cameraMode}
+                draggable
+                labelType="all"
               />
             </Box>
             <Box display="flex" justifyContent="flex-end">

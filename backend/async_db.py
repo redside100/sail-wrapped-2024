@@ -3,7 +3,12 @@ import time
 from typing import Dict, List, Optional
 import aiosqlite
 from util import get_default_discord_avatar_url
-from consts import ATTACHMENT_URL_BASE, AVATAR_URL_BASE, VIDEO_EXT_LIST
+from consts import (
+    ATTACHMENT_URL_BASE,
+    AVATAR_URL_BASE,
+    EXCLUDED_EXTENSIONS,
+    VIDEO_EXT_LIST,
+)
 from models import (
     AttachmentInfo,
     AttachmentSummary,
@@ -31,6 +36,9 @@ async def cleanup():
 
 async def get_random_attachment(year: int, video_only: bool = False) -> AttachmentInfo:
     where_clause = f"lower(extension) IN ({', '.join(['?' for _ in VIDEO_EXT_LIST])})"
+    default_exclude_clause = (
+        f"lower(extension) NOT IN ({', '.join(['?' for _ in EXCLUDED_EXTENSIONS])})"
+    )
     if video_only:
         cursor = await conn.execute(
             f"SELECT id, file_name, author_id AS sender_id, author_name AS sender_handle, attachments.timestamp, related_message_id, channel_id, channel_name, content FROM attachments LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE id IN (SELECT id FROM attachments WHERE {where_clause} AND year = ? ORDER BY RANDOM() LIMIT 1)",
@@ -38,8 +46,8 @@ async def get_random_attachment(year: int, video_only: bool = False) -> Attachme
         )
     else:
         cursor = await conn.execute(
-            f"SELECT id, file_name, author_id AS sender_id, author_name AS sender_handle, attachments.timestamp, related_message_id, channel_id, channel_name, content FROM attachments LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE id IN (SELECT id FROM attachments WHERE year = ? ORDER BY RANDOM() LIMIT 1)",
-            (year,),
+            f"SELECT id, file_name, author_id AS sender_id, author_name AS sender_handle, attachments.timestamp, related_message_id, channel_id, channel_name, content FROM attachments LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE id IN (SELECT id FROM attachments WHERE {default_exclude_clause} AND year = ? ORDER BY RANDOM() LIMIT 1)",
+            [*EXCLUDED_EXTENSIONS, year],
         )
 
     row = await cursor.fetchone()
@@ -406,13 +414,13 @@ async def get_time_machine_screenshot(date: datetime, year: int):
 @AsyncTTL(time_to_live=3600, maxsize=None)
 async def get_mention_graph(year: int):
     async with conn.execute(
-        "SELECT user_name, most_mentioned_given_name FROM users WHERE year = ? AND most_mentioned_given_count > 0",
+        "SELECT user_name, most_mentioned_given_name, most_mentioned_given_count FROM users WHERE year = ? AND most_mentioned_given_count > 0",
         (year,),
     ) as cursor:
         rows = await cursor.fetchall()
         edges = []
         for row in rows:
-            username, mentioned_name = row
+            username, mentioned_name, count = row
             edge = MentionGraphEdge(
                 from_user=username,
                 from_user_avatar_url=(
@@ -426,6 +434,7 @@ async def get_mention_graph(year: int):
                     if year >= 2025
                     else get_default_discord_avatar_url(mentioned_name)
                 ),
+                count=count,
             )
             edges.append(edge)
 

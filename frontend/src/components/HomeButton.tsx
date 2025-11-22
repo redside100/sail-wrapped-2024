@@ -31,7 +31,7 @@ const HomeButton = ({
       onClick={() => navigate(to)}
     >
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Stack gap={1}>
+        <Stack gap={0.5}>
           <Typography variant="h5">{title}</Typography>
           <Typography>{description}</Typography>
         </Stack>
