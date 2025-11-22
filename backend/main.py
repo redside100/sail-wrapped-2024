@@ -22,6 +22,8 @@ from cachetools import TTLCache
 token_cache = TTLCache(ttl=86400 * 7, maxsize=float("inf"))
 session = None
 
+CURRENT_YEAR = 2024
+
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
@@ -134,10 +136,12 @@ async def user_info(token: Annotated[str | None, Header()] = None):
 
 @app.get("/attachment/random")
 async def get_random_attachment(
-    video_only: bool = False, token: Annotated[str | None, Header()] = None
+    video_only: bool = False,
+    token: Annotated[str | None, Header()] = None,
+    year: int = CURRENT_YEAR,
 ):
     check_token(token_cache, token)
-    return await async_db.get_random_attachment(video_only)
+    return await async_db.get_random_attachment(year, video_only)
 
 
 @app.get("/attachment/view/{attachment_id}")
@@ -157,6 +161,7 @@ async def get_attachment(
 async def get_random_message(
     min_length: int,
     token: Annotated[str | None, Header()] = None,
+    year: int = CURRENT_YEAR,
 ):
     check_token(token_cache, token)
     if min_length < 1:
@@ -164,7 +169,7 @@ async def get_random_message(
             status_code=400, detail="The minimum length must be at least 1."
         )
 
-    message = await async_db.get_random_message(min_length=min_length)
+    message = await async_db.get_random_message(year, min_length=min_length)
     if not message:
         raise HTTPException(
             status_code=404, detail="There are no messages with that minimum length."
@@ -217,9 +222,12 @@ async def leaderboard(token: Annotated[str | None, Header()] = None):
 
 
 @app.get("/stats")
-async def stats(token: Annotated[str | None, Header()] = None):
+async def stats(
+    token: Annotated[str | None, Header()] = None,
+    year: int = CURRENT_YEAR,
+):
     check_token(token_cache, token)
-    stats = await async_db.get_stats(token_cache[token])
+    stats = await async_db.get_stats(token_cache[token], year)
     if not stats:
         raise HTTPException(status=404, detail="No stats found for user.")
 
@@ -230,10 +238,11 @@ async def stats(token: Annotated[str | None, Header()] = None):
 async def time_machine(
     date: Annotated[str, Path(title="Date of snapshot in YYYY-MM-DD format")],
     token: Annotated[str | None, Header()] = None,
+    year: int = CURRENT_YEAR,
 ):
     check_token(token_cache, token)
     converted_date = datetime.strptime(date, "%Y-%m-%d")
-    return await async_db.get_time_machine_screenshot(converted_date)
+    return await async_db.get_time_machine_screenshot(converted_date, year)
 
 
 if __name__ == "__main__":

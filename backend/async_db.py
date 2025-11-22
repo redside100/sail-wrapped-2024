@@ -26,16 +26,17 @@ async def cleanup():
         await conn.close()
 
 
-async def get_random_attachment(video_only: bool = False) -> AttachmentInfo:
+async def get_random_attachment(year: int, video_only: bool = False) -> AttachmentInfo:
     where_clause = f"lower(extension) IN ({', '.join(['?' for _ in VIDEO_EXT_LIST])})"
     if video_only:
         cursor = await conn.execute(
-            f"SELECT id, file_name, author_id AS sender_id, author_name AS sender_handle, attachments.timestamp, related_message_id, channel_id, channel_name, content FROM attachments LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE id IN (SELECT id FROM attachments WHERE {where_clause} ORDER BY RANDOM() LIMIT 1)",
-            VIDEO_EXT_LIST,
+            f"SELECT id, file_name, author_id AS sender_id, author_name AS sender_handle, attachments.timestamp, related_message_id, channel_id, channel_name, content FROM attachments LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE id IN (SELECT id FROM attachments WHERE {where_clause} AND year = ? ORDER BY RANDOM() LIMIT 1)",
+            [*VIDEO_EXT_LIST, year],
         )
     else:
         cursor = await conn.execute(
-            f"SELECT id, file_name, author_id AS sender_id, author_name AS sender_handle, attachments.timestamp, related_message_id, channel_id, channel_name, content FROM attachments LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE id IN (SELECT id FROM attachments ORDER BY RANDOM() LIMIT 1)"
+            f"SELECT id, file_name, author_id AS sender_id, author_name AS sender_handle, attachments.timestamp, related_message_id, channel_id, channel_name, content FROM attachments LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE id IN (SELECT id FROM attachments WHERE year = ? ORDER BY RANDOM() LIMIT 1)",
+            (year,),
         )
 
     row = await cursor.fetchone()
@@ -59,10 +60,10 @@ async def get_random_attachment(video_only: bool = False) -> AttachmentInfo:
     )
 
 
-async def get_random_message(min_length: int = 1) -> MessageInfo:
+async def get_random_message(year: int, min_length: int = 1) -> MessageInfo:
     async with conn.execute(
-        "SELECT message_id, content, channel_name, author_id, author_name, timestamp, channel_id FROM messages WHERE message_id IN (SELECT message_id FROM messages WHERE content_length >= ? ORDER BY RANDOM() LIMIT 1)",
-        (min_length,),
+        "SELECT message_id, content, channel_name, author_id, author_name, timestamp, channel_id FROM messages WHERE message_id IN (SELECT message_id FROM messages WHERE content_length >= ? AND year = ? ORDER BY RANDOM() LIMIT 1)",
+        (min_length, year),
     ) as cursor:
         row = await cursor.fetchone()
 
@@ -300,7 +301,7 @@ FROM
 
 
 @AsyncTTL(time_to_live=3600, maxsize=None)
-async def get_stats(discord_id: int):
+async def get_stats(discord_id: int, year: int):
     query = """
 SELECT
     user_nickname,
@@ -319,11 +320,11 @@ SELECT
 FROM
     users
 WHERE
-    user_id = ?;
+    user_id = ? AND year = ?;
 """
     async with conn.execute(
         query,
-        (discord_id,),
+        (discord_id, year),
     ) as cursor:
         row = await cursor.fetchone()
 
@@ -347,14 +348,14 @@ WHERE
     )
 
 
-async def get_time_machine_screenshot(date: datetime):
+async def get_time_machine_screenshot(date: datetime, year: int):
     MAX_MESSAGE_COUNT = 5
     MAX_ATTACHMENT_COUNT = 3
     start_time = int(date.replace(tzinfo=timezone.utc).timestamp())
     end_time = start_time + 86400
     async with conn.execute(
-        "SELECT id, file_name, author_id AS sender_id, author_name AS sender_handle, attachments.timestamp, related_message_id, channel_id, channel_name, content FROM attachments LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE messages.timestamp >= ? AND messages.timestamp <= ? ORDER BY RANDOM() LIMIT ?",
-        (start_time, end_time, MAX_ATTACHMENT_COUNT),
+        "SELECT id, file_name, author_id AS sender_id, author_name AS sender_handle, attachments.timestamp, related_message_id, channel_id, channel_name, content FROM attachments LEFT JOIN messages ON attachments.related_message_id = messages.message_id WHERE messages.timestamp >= ? AND messages.timestamp <= ? AND year = ? ORDER BY RANDOM() LIMIT ?",
+        (start_time, end_time, year, MAX_ATTACHMENT_COUNT),
     ) as cursor:
         rows = await cursor.fetchall()
         attachments = [
@@ -375,8 +376,8 @@ async def get_time_machine_screenshot(date: datetime):
         ]
 
     async with conn.execute(
-        "SELECT message_id, content, channel_name, author_id, author_name, timestamp, channel_id FROM messages WHERE content_length > 0 AND timestamp >= ? AND timestamp <= ? ORDER BY RANDOM() LIMIT ?",
-        (start_time, end_time, MAX_MESSAGE_COUNT),
+        "SELECT message_id, content, channel_name, author_id, author_name, timestamp, channel_id FROM messages WHERE content_length > 0 AND timestamp >= ? AND timestamp <= ? AND year = ? ORDER BY RANDOM() LIMIT ?",
+        (start_time, end_time, year, MAX_MESSAGE_COUNT),
     ) as cursor:
         rows = await cursor.fetchall()
 
