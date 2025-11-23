@@ -77,4 +77,7 @@ CREATE INDEX IF NOT EXISTS "idx_messages_content" ON "messages" (
 CREATE INDEX IF NOT EXISTS "idx_messages_total_reactions" ON "messages" (
 	"total_reactions"
 );
+CREATE INDEX IF NOT EXISTS "idx_messages_year" ON "messages" (
+	"year"
+)
 COMMIT;
