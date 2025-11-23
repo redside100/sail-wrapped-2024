@@ -1,4 +1,4 @@
-# Sail Wrapped 2024
+# Sail Wrapped
 
 Data processing, backend, frontend for Sail Wrapped. Originally just for 2024, but now generalized to support any year!
 
