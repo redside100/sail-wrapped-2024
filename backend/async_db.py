@@ -71,9 +71,22 @@ async def get_random_attachment(year: int, video_only: bool = False) -> Attachme
     )
 
 
-async def get_random_message(year: int, min_length: int = 1) -> MessageInfo:
+async def get_random_message(
+    year: int, min_length: int = 1, links_only: bool = False
+) -> MessageInfo:
+    where_clause = (
+        "AND (content LIKE '%http://%' OR content LIKE '%https://%') "
+        if links_only
+        else ""
+    )
+    query = f"""
+SELECT message_id, content, channel_name, author_id, author_name, timestamp, channel_id 
+FROM messages 
+WHERE message_id 
+IN (SELECT message_id FROM messages WHERE content_length >= ? AND year = ? {where_clause}ORDER BY RANDOM() LIMIT 1)
+"""
     async with conn.execute(
-        "SELECT message_id, content, channel_name, author_id, author_name, timestamp, channel_id FROM messages WHERE message_id IN (SELECT message_id FROM messages WHERE content_length >= ? AND year = ? ORDER BY RANDOM() LIMIT 1)",
+        query,
         (min_length, year),
     ) as cursor:
         row = await cursor.fetchone()

@@ -162,6 +162,7 @@ async def get_attachment(
 async def get_random_message(
     min_length: int,
     token: Annotated[str | None, Header()] = None,
+    links_only: bool = False,
     year: int = CURRENT_YEAR,
 ):
     check_token(token_cache, token)
@@ -170,7 +171,9 @@ async def get_random_message(
             status_code=400, detail="The minimum length must be at least 1."
         )
 
-    message = await async_db.get_random_message(year, min_length=min_length)
+    message = await async_db.get_random_message(
+        year, min_length=min_length, links_only=links_only
+    )
     if not message:
         raise HTTPException(
             status_code=404, detail="There are no messages with that minimum length."

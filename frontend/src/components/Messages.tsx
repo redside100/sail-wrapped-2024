@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Checkbox,
   Link,
   Stack,
   TextField,
@@ -96,6 +97,7 @@ const Messages = () => {
   const { viewMessageId } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [minLength, setMinLength] = useState<number | null>(12);
+  const [linksOnly, setLinksOnly] = useState(false);
   const [likeAdjustment, setLikeAdjustment] = useState(0);
   const [style] = useSprings(3, (idx: number) => ({
     from: {
@@ -163,7 +165,12 @@ const Messages = () => {
     const token = localStorage.getItem("access_token") ?? "";
     setMessageInfo(null);
     setIsLoading(true);
-    const [res, status] = await getRandomMessage(token, minLength ?? 8, year);
+    const [res, status] = await getRandomMessage(
+      token,
+      linksOnly,
+      minLength ?? 8,
+      year
+    );
     if (status !== 200) {
       toast.error(`Failed to fetch message. Reason: ${res.detail}`);
       setIsLoading(false);
@@ -262,6 +269,16 @@ const Messages = () => {
                     setMinLength(Number(e.target.value));
                   }}
                 />
+              </Box>
+              <Box display="flex" alignItems="center" justifyContent="center">
+                <Checkbox
+                  sx={{ color: "white", p: 0 }}
+                  value={linksOnly}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setLinksOnly(e.target.checked)
+                  }
+                />
+                <Typography ml={1}>Links Only</Typography>
               </Box>
             </>
           )}

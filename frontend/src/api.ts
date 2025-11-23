@@ -81,11 +81,12 @@ export const getAttachment = async (
 
 export const getRandomMessage = async (
   token: string,
+  linksOnly: boolean,
   minLength: number,
   year: number
 ) => {
   const res = await fetch(
-    `${API_BASE}/message/random?year=${year}&min_length=${minLength}`,
+    `${API_BASE}/message/random?year=${year}&min_length=${minLength}&links_only=${linksOnly}`,
     {
       method: "GET",
       headers: {
